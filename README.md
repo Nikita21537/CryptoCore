@@ -62,3 +62,14 @@ openssl enc -aes-128-cbc -d \
     -K 000102030405060708090a0b0c0d0e0f \
     -iv $(xxd -p iv.bin | tr -d '\n') \
     -in ciphertext_only.bin -out decrypted.txt
+# Шифрование OpenSSL
+openssl enc -aes-128-cbc \
+    -K 000102030405060708090a0b0c0d0e0f \
+    -iv AABBCCDDEEFF00112233445566778899 \
+    -in plain.txt -out openssl_cipher.bin
+
+# Дешифрование
+python src/main.py --algorithm aes --mode cbc --decrypt \
+    --key 000102030405060708090a0b0c0d0e0f \
+    --iv AABBCCDDEEFF00112233445566778899 \
+    --input openssl_cipher.bin --output decrypted.txt
