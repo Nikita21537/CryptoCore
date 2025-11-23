@@ -1,48 +1,51 @@
-import os
+from Crypto.Util.Padding import pad, unpad
 from src.modes.mode_interface import ModeInterface
 
-class CFBCipher(ModeInterface):
-    def __init__(self, cipher, block_size=16):
+class CBCCipher(ModeInterface):
+    def __init__(self, cipher, block_size=16, rng_function=None):
         self.cipher = cipher
         self.block_size = block_size
+        self.rng_function = rng_function
 
     def encrypt(self, plaintext):
-        iv = os.urandom(self.block_size)
-        ciphertext = b''
-        feedback = iv
+        if not self.rng_function:
+            raise RuntimeError("RNG function not provided for CBC mode")
+            
+        iv = self.rng_function(self.block_size)
+        plaintext = pad(plaintext, self.block_size)
         
-        for i in range(0, len(plaintext), self.block_size):
-            block = plaintext[i:i+self.block_size]
-            encrypted_feedback = self.cipher.encrypt(feedback)
-            
-            # XOR с открытым текстом
-            encrypted_block = bytes(a ^ b for a, b in zip(block, encrypted_feedback[:len(block)]))
+        blocks = [plaintext[i:i+self.block_size] for i in range(0, len(plaintext), self.block_size)]
+        
+        ciphertext = b''
+        prev_block = iv
+        
+        for block in blocks:
+            # XOR с предыдущим блоком шифротекста (или IV для первого блока)
+            xored = bytes(a ^ b for a, b in zip(block, prev_block))
+            encrypted_block = self.cipher.encrypt(xored)
             ciphertext += encrypted_block
-            
-            # Для следующего блока используем зашифрованный блок как feedback
-            if len(block) == self.block_size:
-                feedback = encrypted_block
-            else:
-                # Для последнего неполного блока используем начало зашифрованного feedback
-                feedback = encrypted_feedback
-
+            prev_block = encrypted_block
+        
         return iv + ciphertext
 
     def decrypt(self, ciphertext):
+        # Извлекаем IV из начала шифротекста
         iv = ciphertext[:self.block_size]
         ciphertext = ciphertext[self.block_size:]
-        plaintext = b''
-        feedback = iv
         
-        for i in range(0, len(ciphertext), self.block_size):
-            block = ciphertext[i:i+self.block_size]
-            encrypted_feedback = self.cipher.encrypt(feedback)
-            
-            # XOR с шифротекстом
-            decrypted_block = bytes(a ^ b for a, b in zip(block, encrypted_feedback[:len(block)]))
-            plaintext += decrypted_block
-            
-            # Для следующего блока используем текущий блок шифротекста как feedback
-            feedback = block
-
+        blocks = [ciphertext[i:i+self.block_size] for i in range(0, len(ciphertext), self.block_size)]
+        
+        plaintext = b''
+        prev_block = iv
+        
+        for block in blocks:
+            decrypted_block = self.cipher.decrypt(block)
+            # XOR с предыдущим блоком шифротекста (или IV для первого блока)
+            xored = bytes(a ^ b for a, b in zip(decrypted_block, prev_block))
+            plaintext += xored
+            prev_block = block
+        
+        # Убираем padding
+        plaintext = unpad(plaintext, self.block_size)
+        
         return plaintext
