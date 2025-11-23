@@ -1,6 +1,7 @@
 import argparse
 import sys
 import os
+from src.csprng import is_weak_key
 
 def parse_args():
     parser = argparse.ArgumentParser(description='CryptoCore - Cryptographic Tool')
@@ -10,8 +11,10 @@ def parse_args():
     parser.add_argument('--mode', required=True, 
                         choices=['ecb', 'cbc', 'cfb', 'ofb', 'ctr'],
                         help='Mode of operation')
-    parser.add_argument('--key', required=True,
-                        help='Encryption key as hexadecimal string')
+    
+    # Ключ теперь опциональный для шифрования
+    parser.add_argument('--key',
+                        help='Encryption key as hexadecimal string (optional for encryption)')
     
     # Операции (mutually exclusive)
     operation_group = parser.add_mutually_exclusive_group(required=True)
@@ -29,14 +32,25 @@ def parse_args():
     
     args = parser.parse_args()
     
-    # Валидация ключа
-    try:
-        key_bytes = bytes.fromhex(args.key)
-        if len(key_bytes) != 16:
-            raise ValueError("AES-128 key must be 16 bytes (32 hex characters)")
-    except ValueError as e:
-        print(f"Error: Invalid key format - {e}", file=sys.stderr)
+    # Валидация для дешифрования - ключ обязателен
+    if args.decrypt and not args.key:
+        print("Error: --key argument is required for decryption", file=sys.stderr)
         sys.exit(1)
+    
+    # Валидация ключа если предоставлен
+    if args.key:
+        try:
+            key_bytes = bytes.fromhex(args.key)
+            if len(key_bytes) != 16:
+                raise ValueError("AES-128 key must be 16 bytes (32 hex characters)")
+            
+            # Проверка на слабый ключ
+            if is_weak_key(key_bytes):
+                print(f"Warning: The provided key may be weak: {args.key}", file=sys.stderr)
+                
+        except ValueError as e:
+            print(f"Error: Invalid key format - {e}", file=sys.stderr)
+            sys.exit(1)
     
     # Валидация IV
     if args.iv:
