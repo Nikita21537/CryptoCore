@@ -27,3 +27,38 @@ python cryptocore.py --algorithm aes --mode ecb --decrypt --key 0001020304050607
 
 # Проверяем результат
 diff test_input.txt test_decrypted.txt
+### Поддерживаемые режимы
+- `cbc` - Cipher Block Chaining
+- `cfb` - Cipher Feedback  
+- `ofb` - Output Feedback
+- `ctr` - Counter
+
+### Использование с новыми режимами
+
+#### Шифрование (IV генерируется автоматически)
+```bash
+python src/main.py --algorithm aes --mode cbc --encrypt \
+    --key 000102030405060708090a0b0c0d0e0f \
+    --input plaintext.txt --output ciphertext.bin
+python src/main.py --algorithm aes --mode cbc --decrypt \
+    --key 000102030405060708090a0b0c0d0e0f \
+    --iv aabbccddeeff00112233445566778899 \
+    --input ciphertext.bin --output decrypted.txt
+###Дешифрование (IV читается из файла)
+python src/main.py --algorithm aes --mode cbc --decrypt \
+    --key 000102030405060708090a0b0c0d0e0f \
+    --input ciphertext.bin --output decrypted.txt
+# Шифрование
+python src/main.py --algorithm aes --mode cbc --encrypt \
+    --key 000102030405060708090a0b0c0d0e0f \
+    --input plain.txt --output cipher.bin
+
+# Извлечение IV и шифротекста
+dd if=cipher.bin of=iv.bin bs=16 count=1
+dd if=cipher.bin of=ciphertext_only.bin bs=16 skip=1
+
+# Дешифрование OpenSSL
+openssl enc -aes-128-cbc -d \
+    -K 000102030405060708090a0b0c0d0e0f \
+    -iv $(xxd -p iv.bin | tr -d '\n') \
+    -in ciphertext_only.bin -out decrypted.txt
