@@ -73,3 +73,34 @@ python src/main.py --algorithm aes --mode cbc --decrypt \
     --key 000102030405060708090a0b0c0d0e0f \
     --iv AABBCCDDEEFF00112233445566778899 \
     --input openssl_cipher.bin --output decrypted.txt
+
+## Спринт 3: Безопасный источник случайности
+
+### Автоматическая генерация ключей
+
+Теперь инструмент поддерживает автоматическую генерацию криптографически стойких ключей:
+
+```bash
+# Шифрование с автоматической генерацией ключа
+python src/main.py --algorithm aes --mode ctr --encrypt --input plaintext.txt --output ciphertext.bin
+[INFO] Generated random key: 1a2b3c4d5e6f7890fedcba9876543210
+
+# Дешифрование (ключ обязателен)
+python src/main.py --algorithm aes --mode ctr --decrypt --key 1a2b3c4d5e6f7890fedcba9876543210 --input ciphertext.bin --output decrypted.txt
+Тестирование NIST STS
+Для запуска тестов NIST Statistical Test Suite:
+
+Сгенерируйте тестовые данные:
+
+
+python tests/test_csprng.py
+Скачайте и установите NIST STS
+
+Запустите тесты:
+
+
+# Сгенерируйте файл для тестирования
+python -c "from src.csprng import generate_random_bytes; data = generate_random_bytes(10000000); open('random_test_data.bin', 'wb').write(data)"
+
+# Запустите NIST STS
+./assess 10000000
