@@ -1,23 +1,22 @@
 import sys
 
-def read_file(filename: str) -> bytes:
-    """
-    Чтение файла в бинарном режиме
-    """
+def read_file(file_path):
+  
     try:
-        with open(filename, 'rb') as file:
+        with open(file_path, 'rb') as file:
             return file.read()
-    except IOError as e:
-        print(f"Ошибка чтения файла {filename}: {e}", file=sys.stderr)
-        sys.exit(1)
+    except Exception as e:
+        handle_file_error(e)
 
-def write_file(filename: str, data: bytes) -> None:
-    """
-    Запись данных в файл в бинарном режиме
-    """
+def write_file(file_path, data):
+   
     try:
-        with open(filename, 'wb') as file:
+        with open(file_path, 'wb') as file:
             file.write(data)
-    except IOError as e:
-        print(f"Ошибка записи файла {filename}: {e}", file=sys.stderr)
-        sys.exit(1)
+    except Exception as e:
+        handle_file_error(e)
+
+def handle_file_error(error):
+   
+    print(f"File error: {error}", file=sys.stderr)
+    sys.exit(1)
