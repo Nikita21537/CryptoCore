@@ -2,6 +2,7 @@ import sys
 from src.cli_parser import parse_args
 from src.file_io import read_file, write_file, handle_file_error
 from src.crypto_core import CryptoCore
+from src.csprng import generate_random_bytes
 
 def main():
     try:
@@ -11,7 +12,13 @@ def main():
         input_data = read_file(args.input)
         
         # Подготовка ключа
-        key = bytes.fromhex(args.key)
+        if args.key:
+            key = bytes.fromhex(args.key)
+        else:
+            # Генерация случайного ключа для шифрования
+            key = generate_random_bytes(16)
+            key_hex = key.hex()
+            print(f"[INFO] Generated random key: {key_hex}")
         
         # Создание криптографического ядра
         crypto = CryptoCore(args.algorithm, args.mode, key)
