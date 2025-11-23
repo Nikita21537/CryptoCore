@@ -1,11 +1,11 @@
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
-import os
 from src.modes.ecb import ECBCipher
 from src.modes.cbc import CBCCipher
 from src.modes.cfb import CFBCipher
 from src.modes.ofb import OFBCipher
 from src.modes.ctr import CTRCipher
+from src.csprng import generate_random_bytes
 
 class CryptoCore:
     def __init__(self, algorithm, mode, key):
@@ -35,7 +35,7 @@ class CryptoCore:
         if mode not in handlers:
             raise ValueError(f"Unsupported mode: {mode}")
             
-        return handlers[mode](self.aes_cipher, self.block_size)
+        return handlers[mode](self.aes_cipher, self.block_size, generate_random_bytes)
     
     def encrypt(self, plaintext):
         return self.mode_handler.encrypt(plaintext)
