@@ -4,7 +4,7 @@ import subprocess
 import tempfile
 
 def run_command(cmd):
-    """Выполняет команду и возвращает результат"""
+    
     try:
         result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
         return result.returncode == 0, result.stdout, result.stderr
@@ -12,7 +12,7 @@ def run_command(cmd):
         return False, "", str(e)
 
 def test_mode(mode, key, iv=None):
-    """Тестирует конкретный режим на совместимость с OpenSSL"""
+    #Тестирует конкретный режим на совместимость с OpenSSL
     print(f"\n=== Testing {mode.upper()} mode ===")
     
     with tempfile.NamedTemporaryFile(mode='w', delete=False) as f:
