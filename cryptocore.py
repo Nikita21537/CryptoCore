@@ -1,53 +1,48 @@
-import sys
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import pad, unpad
 import os
+from src.modes.ecb import ECBCipher
+from src.modes.cbc import CBCCipher
+from src.modes.cfb import CFBCipher
+from src.modes.ofb import OFBCipher
+from src.modes.ctr import CTRCipher
 
-# Добавляем src в путь для импорта
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
-
-from cli_parser import parse_cli_args
-from file_io import read_file, write_file
-from modes.ecb import encrypt_ecb, decrypt_ecb
-
-def main():
-    """
-    Основная функция приложения
-    """
-    try:
-        # Парсинг аргументов командной строки
-        args = parse_cli_args()
+class CryptoCore:
+    def __init__(self, algorithm, mode, key):
+        if algorithm != 'aes':
+            raise ValueError(f"Unsupported algorithm: {algorithm}")
         
-        # Преобразование ключа из hex в bytes
-        key_bytes = bytes.fromhex(args.key)
+        self.algorithm = algorithm
+        self.mode = mode
+        self.key = key
+        self.block_size = 16
         
-        # Чтение входного файла
-        input_data = read_file(args.input)
+        # Создаем базовый cipher AES
+        self.aes_cipher = AES.new(key, AES.MODE_ECB)
         
-        # Выполнение операции
-        if args.encrypt:
-            if args.algorithm == "aes" and args.mode == "ecb":
-                output_data = encrypt_ecb(input_data, key_bytes)
-            else:
-                print(f"Ошибка: Неподдерживаемая комбинация алгоритма и режима: {args.algorithm}-{args.mode}", file=sys.stderr)
-                sys.exit(1)
-        else:  # decrypt
-            if args.algorithm == "aes" and args.mode == "ecb":
-                output_data = decrypt_ecb(input_data, key_bytes)
-            else:
-                print(f"Ошибка: Неподдерживаемая комбинация алгоритма и режима: {args.algorithm}-{args.mode}", file=sys.stderr)
-                sys.exit(1)
+        # Выбираем режим
+        self.mode_handler = self._get_mode_handler(mode)
+    
+    def _get_mode_handler(self, mode):
+        handlers = {
+            'ecb': ECBCipher,
+            'cbc': CBCCipher,
+            'cfb': CFBCipher,
+            'ofb': OFBCipher,
+            'ctr': CTRCipher
+        }
         
-        # Запись выходного файла
-        write_file(args.output, output_data)
+        if mode not in handlers:
+            raise ValueError(f"Unsupported mode: {mode}")
+            
+        return handlers[mode](self.aes_cipher, self.block_size)
+    
+    def encrypt(self, plaintext):
+        return self.mode_handler.encrypt(plaintext)
+    
+    def decrypt(self, ciphertext, iv=None):
+        if iv and self.mode in ['cbc', 'cfb', 'ofb', 'ctr']:
+            # Если IV предоставлен извне, используем его
+            ciphertext = iv + ciphertext
         
-        print(f"Операция завершена успешно!")
-        print(f"Входной файл: {args.input}")
-        print(f"Выходной файл: {args.output}")
-        print(f"Размер входных данных: {len(input_data)} байт")
-        print(f"Размер выходных данных: {len(output_data)} байт")
-        
-    except Exception as e:
-        print(f"Критическая ошибка: {e}", file=sys.stderr)
-        sys.exit(1)
-
-if __name__ == "__main__":
-    main()
+        return self.mode_handler.decrypt(ciphertext)
