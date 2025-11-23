@@ -1,13 +1,16 @@
-import os
 from src.modes.mode_interface import ModeInterface
 
 class OFBCipher(ModeInterface):
-    def __init__(self, cipher, block_size=16):
+    def __init__(self, cipher, block_size=16, rng_function=None):
         self.cipher = cipher
         self.block_size = block_size
+        self.rng_function = rng_function
 
     def encrypt(self, plaintext):
-        iv = os.urandom(self.block_size)
+        if not self.rng_function:
+            raise RuntimeError("RNG function not provided for OFB mode")
+            
+        iv = self.rng_function(self.block_size)
         ciphertext = b''
         keystream = iv
         
@@ -42,4 +45,3 @@ class OFBCipher(ModeInterface):
             keystream = encrypted_keystream
 
         return plaintext
-        
