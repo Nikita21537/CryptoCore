@@ -46,3 +46,4 @@ class CryptoCore:
             ciphertext = iv + ciphertext
         
         return self.mode_handler.decrypt(ciphertext)
+        
