@@ -104,3 +104,19 @@ python -c "from src.csprng import generate_random_bytes; data = generate_random_
 
 # Запустите NIST STS
 ./assess 10000000
+## Спринт 4: Хеш-функции для проверки целостности данных
+
+### Новые команды
+
+Инструмент теперь поддерживает subcommand `dgst` для вычисления хешей:
+
+```bash
+# Базовое вычисление хеша
+python src/main.py dgst --algorithm sha256 --input document.pdf
+5d5b09f6dcb2d53a5fffc60c4ac0d55fb052072fa2fe5d95f011b5d5d5b0b0b5  document.pdf
+
+# Хеш с выводом в файл
+python src/main.py dgst --algorithm sha3-256 --input backup.tar --output backup.sha3
+
+# Хеш из stdin
+echo -n "hello" | python src/main.py dgst --algorithm sha256 --input -
