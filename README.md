@@ -36,7 +36,7 @@ diff test_input.txt test_decrypted.txt
 ### Использование с новыми режимами
 
 #### Шифрование (IV генерируется автоматически)
-```bash
+
 python src/main.py --algorithm aes --mode cbc --encrypt \
     --key 000102030405060708090a0b0c0d0e0f \
     --input plaintext.txt --output ciphertext.bin
@@ -80,25 +80,19 @@ python src/main.py --algorithm aes --mode cbc --decrypt \
 
 Теперь инструмент поддерживает автоматическую генерацию криптографически стойких ключей:
 
-```bash
 # Шифрование с автоматической генерацией ключа
 python src/main.py --algorithm aes --mode ctr --encrypt --input plaintext.txt --output ciphertext.bin
 [INFO] Generated random key: 1a2b3c4d5e6f7890fedcba9876543210
-
 # Дешифрование (ключ обязателен)
 python src/main.py --algorithm aes --mode ctr --decrypt --key 1a2b3c4d5e6f7890fedcba9876543210 --input ciphertext.bin --output decrypted.txt
 Тестирование NIST STS
 Для запуска тестов NIST Statistical Test Suite:
-
-Сгенерируйте тестовые данные:
-
+#Сгенерируйте тестовые данные:
 
 python tests/test_csprng.py
-Скачайте и установите NIST STS
+#Скачайте и установите NIST STS
 
-Запустите тесты:
-
-
+#Запустите тесты:
 # Сгенерируйте файл для тестирования
 python -c "from src.csprng import generate_random_bytes; data = generate_random_bytes(10000000); open('random_test_data.bin', 'wb').write(data)"
 
@@ -110,7 +104,7 @@ python -c "from src.csprng import generate_random_bytes; data = generate_random_
 
 Инструмент теперь поддерживает subcommand `dgst` для вычисления хешей:
 
-```bash
+
 # Базовое вычисление хеша
 python src/main.py dgst --algorithm sha256 --input document.pdf
 5d5b09f6dcb2d53a5fffc60c4ac0d55fb052072fa2fe5d95f011b5d5d5b0b0b5  document.pdf
