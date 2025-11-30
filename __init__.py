@@ -10,7 +10,7 @@ from file_io import read_file, write_file
 from modes.ecb import encrypt_ecb, decrypt_ecb
 
 def main():
-    """Основная функция приложения"""
+   
     try:
         # Парсинг аргументов
         args = parse_arguments()
