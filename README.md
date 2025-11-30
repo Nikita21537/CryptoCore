@@ -97,7 +97,7 @@ python tests/test_csprng.py
 python -c "from src.csprng import generate_random_bytes; data = generate_random_bytes(10000000); open('random_test_data.bin', 'wb').write(data)"
 
 # Запустите NIST STS
-./assess 10000000
+assess 10000000
 ## Спринт 4: Хеш-функции для проверки целостности данных
 
 ### Новые команды
@@ -114,3 +114,14 @@ python src/main.py dgst --algorithm sha3-256 --input backup.tar --output backup.
 
 # Хеш из stdin
 echo -n "hello" | python src/main.py dgst --algorithm sha256 --input -
+# Новый синтаксис с subcommand 'enc'
+python src/main.py enc --algorithm aes --mode cbc --encrypt --input plain.txt --output cipher.bin
+
+# Старый синтаксис все еще поддерживается для обратной совместимости
+python src/main.py --algorithm aes --mode cbc --encrypt --input plain.txt --output cipher.bin
+# Запустите тесты хеш-функций
+python tests/test_hash.py
+
+# Проверка известных тестовых векторов
+echo -n "abc" | python src/main.py dgst --algorithm sha256 --input -
+# Должно вывести: ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad
