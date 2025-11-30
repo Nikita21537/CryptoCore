@@ -1,0 +1,14 @@
+from .sha256 import SHA256
+from .sha3_256 import SHA3_256
+
+def get_hash_algorithm(algorithm):
+   
+    algorithms = {
+        'sha256': SHA256,
+        'sha3-256': SHA3_256,
+    }
+    
+    if algorithm not in algorithms:
+        raise ValueError(f"Unsupported hash algorithm: {algorithm}")
+    
+    return algorithms[algorithm]()
