@@ -1,7 +1,7 @@
 import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-
+from hash import SHA3_256, BLAKE2b, sha3_256, blake2b
 from src.hash import get_hash_algorithm
 
 def test_sha256_known_answers():
@@ -96,6 +96,33 @@ def test_interoperability():
         assert all(c in '0123456789abcdef' for c in result), f"{algo} hash contains invalid characters"
         
         print(f" {algo} interoperability format check passed")
+# Тест SHA3-256
+print("=== SHA3-256 Tests ===")
+data = b"hello world"
+
+# Способ 1: через класс
+hasher1 = SHA3_256()
+hasher1.update(data)
+print(f"SHA3-256: {hasher1.hexdigest()}")
+
+# Способ 2: через функцию
+hasher2 = sha3_256(data)
+print(f"SHA3-256: {hasher2.hexdigest()}")
+
+print("\n=== BLAKE2b Tests ===")
+# BLAKE2b-512 (по умолчанию)
+hasher3 = BLAKE2b()
+hasher3.update(data)
+print(f"BLAKE2b-512: {hasher3.hexdigest()}")
+
+# BLAKE2b-256
+hasher4 = BLAKE2b(digest_size=32)
+hasher4.update(data)
+print(f"BLAKE2b-256: {hasher4.hexdigest()}")
+
+# Через функцию
+hasher5 = blake2b(data, digest_size=32)
+print(f"BLAKE2b-256: {hasher5.hexdigest()}")
 
 if __name__ == "__main__":
     print("Running hash function tests...")
