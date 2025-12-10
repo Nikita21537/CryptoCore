@@ -1,14 +1,15 @@
 from .sha256 import SHA256
-from .sha3_256 import SHA3_256
+from .md5 import MD5
+from .sha1 import SHA1
+from .sha3 import SHA3_256, sha3_256
+from .blake2b import BLAKE2b, blake2b
 
-def get_hash_algorithm(algorithm):
-   
-    algorithms = {
-        'sha256': SHA256,
-        'sha3-256': SHA3_256,
-    }
-    
-    if algorithm not in algorithms:
-        raise ValueError(f"Unsupported hash algorithm: {algorithm}")
-    
-    return algorithms[algorithm]()
+__all__ = [
+    'SHA256',
+    'MD5', 
+    'SHA1',
+    'SHA3_256',
+    'sha3_256',
+    'BLAKE2b',
+    'blake2b'
+]
