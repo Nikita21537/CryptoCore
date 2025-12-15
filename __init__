@@ -1,15 +1,20 @@
-from .sha256 import SHA256
-from .md5 import MD5
-from .sha1 import SHA1
-from .sha3 import SHA3_256, sha3_256
-from .blake2b import BLAKE2b, blake2b
+from .ecb import ECB
+from .cbc import CBC
+from .ctr import CTR
+from .gcm import GCM
 
-__all__ = [
-    'SHA256',
-    'MD5', 
-    'SHA1',
-    'SHA3_256',
-    'sha3_256',
-    'BLAKE2b',
-    'blake2b'
-]
+def get_mode(mode_name: str, key: bytes, **kwargs):
+
+    modes = {
+        'ecb': ECB,
+        'cbc': CBC,
+        'ctr': CTR,
+        'gcm': GCM,
+    }
+    
+    if mode_name not in modes:
+        raise ValueError(f"Unsupported mode: {mode_name}")
+    
+    return modes[mode_name](key, **kwargs)
+
+__all__ = ['ECB', 'CBC', 'CTR', 'GCM', 'get_mode']
