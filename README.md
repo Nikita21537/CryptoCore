@@ -184,3 +184,75 @@ python tests/test_hmac_vectors.py
 python -m src.cli dgst --algorithm sha256 --hmac --key 00112233445566778899aabbccddeeff --input README.md
 # Верификация HMAC
 python -m src.cli dgst --algorithm sha256 --hmac --key 00112233445566778899aabbccddeeff --input README.md --verify hmac.txt
+## Sprint 6: Authenticated Encryption (GCM & Encrypt-then-MAC)
+
+### Новые возможности:
+1. **GCM (Galois/Counter Mode)** - аутентифицированное шифрование
+2. **Encrypt-then-MAC** - композитный режим аутентификации
+3. **Associated Data (AAD)** - поддержка дополнительных аутентифицируемых данных
+
+### Примеры использования GCM:
+
+
+# Шифрование с AAD
+cryptocore --algorithm aes --mode gcm --encrypt \
+  --key 00112233445566778899aabbccddeeff \
+  --input data.txt \
+  --output encrypted.bin \
+  --aad aabbccddeeff00112233445566778899
+
+# Расшифрование
+cryptocore --algorithm aes --mode gcm --decrypt \
+  --key 00112233445566778899aabbccddeeff \
+  --input encrypted.bin \
+  --output decrypted.txt \
+  --aad aabbccddeeff00112233445566778899
+  Структура выходных файлов GCM:
+Шифрование: nonce(12) || ciphertext || tag(16)
+
+Расшифрование: проверка тега перед выводом данных
+
+Важные предупреждения безопасности:
+Никогда не используйте один nonce дважды с одним ключом!
+
+При неудачной аутентификации данные не выводятся
+
+AAD аутентифицируется, но не шифруется
+
+
+
+## 11. **Деплой и тестирование**
+
+1. **Установите зависимости:**
+```bash
+pip install -r requirements.txt
+Запустите тесты:
+
+
+python -m pytest tests/test_gcm.py -v
+python -m pytest tests/test_aead.py -v
+Запустите интеграционные тесты:
+
+
+# Тест с OpenSSL (если установлен)
+./tests/integration/test_openssl_compat.sh
+Проверьте CLI:
+
+
+# Создайте тестовые файлы
+echo "Hello, CryptoCore GCM!" > test.txt
+
+# Зашифруйте
+python main.py --algorithm aes --mode gcm --encrypt \
+  --key 000102030405060708090a0b0c0d0e0f \
+  --input test.txt --output test.enc \
+  --aad 0011223344556677
+
+# Расшифруйте
+python main.py --algorithm aes --mode gcm --decrypt \
+  --key 000102030405060708090a0b0c0d0e0f \
+  --input test.enc --output test.dec \
+  --aad 0011223344556677
+
+# Проверьте результат
+cat test.dec
