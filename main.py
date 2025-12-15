@@ -1,102 +1,88 @@
+#!/usr/bin/env python3
+
 import sys
 import os
-from src.cli_parser import parse_args
-from src.file_io import read_file, write_file, handle_file_error
-from src.crypto_core import CryptoCore
-from src.csprng import generate_random_bytes
-from src.hash import get_hash_algorithm
+from src.cli import parse_arguments, validate_arguments, hex_to_bytes_or_empty
+from src.file_io import read_file, write_file, safe_write_file, cleanup_failed_output
+from src.modes import get_mode
+from src.aead import EncryptThenMAC
 
 def main():
+   
+    args = parse_arguments()
+    args = validate_arguments(args)
+    
+    
+    key = bytes.fromhex(args.key)
+    iv = hex_to_bytes_or_empty(args.iv) if args.iv else None
+    aad = hex_to_bytes_or_empty(args.aad) if args.aad else b""
+    
+    
+    input_data = read_file(args.input)
+    
     try:
-        args = parse_args()
-        
-        if args.command == 'enc':
-            _handle_encryption(args)
-        elif args.command == 'dgst':
-            _handle_hashing(args)
+        if args.mode == 'gcm':
+            # Handle GCM mode
+            from src.modes.gcm import GCM, AuthenticationError
+            
+            if args.encrypt:
+                # GCM Encryption
+                cipher = GCM(key, nonce=iv)
+                output = cipher.encrypt(input_data, aad)
+                
+                if args.verbose:
+                    nonce = output[:12]
+                    tag = output[-16:]
+                    ciphertext = output[12:-16]
+                    print(f"[GCM] Nonce: {nonce.hex()}")
+                    print(f"[GCM] Ciphertext length: {len(ciphertext)} bytes")
+                    print(f"[GCM] Tag: {tag.hex()[:16]}...")
+                    print(f"[SUCCESS] Encryption completed successfully")
+                
+                safe_write_file(args.output, output)
+                
+            else:  
+                try:
+                    cipher = GCM(key, nonce=iv)
+                    output = cipher.decrypt(input_data, aad)
+                    
+                    if args.verbose:
+                        print(f"[GCM] Decryption successful")
+                        print(f"[GCM] Plaintext length: {len(output)} bytes")
+                    
+                    safe_write_file(args.output, output)
+                    print("[SUCCESS] Decryption completed successfully")
+                    
+                except AuthenticationError as e:
+                    print(f"[ERROR] {e}", file=sys.stderr)
+                    print("[ERROR] Authentication failed: AAD mismatch or ciphertext tampered", 
+                          file=sys.stderr)
+                    cleanup_failed_output(args.output)
+                    sys.exit(1)
+                    
+        elif args.mode in ['ecb', 'cbc', 'ctr']:
+            
+            cipher = get_mode(args.mode, key, iv=iv)
+            
+            if args.encrypt:
+                output = cipher.encrypt(input_data)
+                if args.verbose:
+                    print(f"[{args.mode.upper()}] Encryption completed")
+            else:
+                output = cipher.decrypt(input_data)
+                if args.verbose:
+                    print(f"[{args.mode.upper()}] Decryption completed")
+            
+            safe_write_file(args.output, output)
+            
         else:
-            print(f"Error: Unknown command: {args.command}", file=sys.stderr)
+            print(f"Unsupported mode: {args.mode}", file=sys.stderr)
             sys.exit(1)
             
     except Exception as e:
-        handle_file_error(e)
-
-def _handle_encryption(args):
-    
-    # Чтение входного файла
-    input_data = read_file(args.input)
-    
-    # Подготовка ключа
-    if args.key:
-        key = bytes.fromhex(args.key)
-    else:
-        # Генерация случайного ключа для шифрования
-        key = generate_random_bytes(16)
-        key_hex = key.hex()
-        print(f"[INFO] Generated random key: {key_hex}")
-    
-    # Создание криптографического ядра
-    crypto = CryptoCore(args.algorithm, args.mode, key)
-    
-    # Выполнение операции
-    if args.encrypt:
-        output_data = crypto.encrypt(input_data)
-    else:
-        # Для дешифрования обрабатываем IV
-        iv = None
-        if args.iv:
-            iv = bytes.fromhex(args.iv)
-        elif args.mode in ['cbc', 'cfb', 'ofb', 'ctr']:
-            # Если IV не предоставлен, читаем из файла
-            if len(input_data) < 16:
-                raise ValueError("Input file too short to contain IV")
-            iv = input_data[:16]
-            input_data = input_data[16:]
-        
-        output_data = crypto.decrypt(input_data, iv)
-    
-    # Запись выходного файла
-    write_file(args.output, output_data)
-    
-    print(f"Operation completed successfully: {args.input} -> {args.output}")
-
-def _handle_hashing(args):
-    
-    
-    if args.input == '-':
-        
-        input_data = sys.stdin.buffer.read()
-        input_filename = '-'
-    else:
-        
-        input_data = read_file(args.input)
-        input_filename = args.input
-    
-    
-    hash_algo = get_hash_algorithm(args.algorithm)
-    
-    
-    chunk_size = 8192  # 8KB chunks
-    if len(input_data) <= chunk_size:
-        hash_algo.update(input_data)
-    else:
-        # Process large file in chunks
-        for i in range(0, len(input_data), chunk_size):
-            chunk = input_data[i:i + chunk_size]
-            hash_algo.update(chunk)
-    
-    
-    hash_result = hash_algo.hexdigest()
-    
-    
-    output_line = f"{hash_result}  {input_filename}\n"
-    
-   
-    if args.output:
-        write_file(args.output, output_line.encode('utf-8'))
-        print(f"Hash written to: {args.output}")
-    else:
-        print(output_line, end='')
+        print(f"[ERROR] Operation failed: {e}", file=sys.stderr)
+        cleanup_failed_output(args.output)
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()
