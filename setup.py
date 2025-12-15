@@ -2,19 +2,13 @@ from setuptools import setup, find_packages
 
 setup(
     name="cryptocore",
-    version="1.0.0",
-    description="CryptoCore - инструмент для криптографических операций",
-    packages=find_packages(where="src"),
-    package_dir={"": "src"},
-    install_requires=[
-        "pycryptodome>=3.10.1",
-    ],
+    version="0.1.0",
+    packages=find_packages(),
+    install_requires=[],
     entry_points={
-        "console_scripts": [
-            "cryptocore=cryptocore:main",
+        'console_scripts': [
+            'cryptocore=src.cli:main',
         ],
     },
-    python_requires=">=3.6",
-    author="CryptoCore Team",
-    author_email="example@example.com",
+    test_suite="tests",
 )
