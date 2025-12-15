@@ -1,81 +1,145 @@
 import argparse
 import sys
 import os
-from src.csprng import is_weak_key
+from src.hash.sha256 import SHA256
+from src.mac.hmac import HMAC
 
-def parse_args():
-    parser = argparse.ArgumentParser(description='CryptoCore - Cryptographic Tool')
+def setup_parser():
+    parser = argparse.ArgumentParser(
+        description="CryptoCore - Cryptography Toolkit",
+        prog="cryptocore"
+    )
     
-    parser.add_argument('--algorithm', required=True, choices=['aes'],
-                        help='Cryptographic algorithm (only AES supported)')
-    parser.add_argument('--mode', required=True, 
-                        choices=['ecb', 'cbc', 'cfb', 'ofb', 'ctr'],
-                        help='Mode of operation')
+    subparsers = parser.add_subparsers(dest='command', help='Available commands')
     
-    # Ключ теперь опциональный для шифрования
-    parser.add_argument('--key',
-                        help='Encryption key as hexadecimal string (optional for encryption)')
+    # Команда dgst
+    dgst_parser = subparsers.add_parser('dgst', help='Message digest and MAC operations')
     
-    # Операции (mutually exclusive)
-    operation_group = parser.add_mutually_exclusive_group(required=True)
-    operation_group.add_argument('--encrypt', action='store_true',
-                                help='Perform encryption')
-    operation_group.add_argument('--decrypt', action='store_true',
-                                help='Perform decryption')
+    # Группа для алгоритма
+    algo_group = dgst_parser.add_argument_group('algorithm selection')
+    algo_group.add_argument(
+        '--algorithm', '-a',
+        choices=['sha256'],
+        default='sha256',
+        help='Hash algorithm to use (default: sha256)'
+    )
     
-    parser.add_argument('--input', required=True,
-                        help='Input file path')
-    parser.add_argument('--output',
-                        help='Output file path (default: derived from input)')
-    parser.add_argument('--iv',
-                        help='Initialization Vector for decryption (hex string)')
+    # Группа для ввода
+    input_group = dgst_parser.add_argument_group('input')
+    input_group.add_argument(
+        '--input', '-i',
+        required=True,
+        help='Input file path'
+    )
     
+    # Группа для вывода
+    output_group = dgst_parser.add_argument_group('output')
+    output_group.add_argument(
+        '--output', '-o',
+        help='Output file path (default: stdout)'
+    )
+    
+    # Новые аргументы для HMAC
+    mac_group = dgst_parser.add_argument_group('MAC options')
+    mac_group.add_argument(
+        '--hmac',
+        action='store_true',
+        help='Enable HMAC mode'
+    )
+    mac_group.add_argument(
+        '--key', '-k',
+        help='Key for HMAC (hexadecimal string)'
+    )
+    mac_group.add_argument(
+        '--verify',
+        metavar='FILE',
+        help='Verify HMAC against value in FILE'
+    )
+    
+    return parser
+
+def dgst_command(args):
+   
+    # Проверка существования файла
+    if not os.path.exists(args.input):
+        print(f"Error: Input file '{args.input}' not found", file=sys.stderr)
+        return 1
+    
+    # Если включен HMAC, проверяем наличие ключа
+    if args.hmac:
+        if not args.key:
+            print("Error: --key is required when using --hmac", file=sys.stderr)
+            return 1
+        
+        # Создаем объект HMAC
+        try:
+            hmac = HMAC(args.key, args.algorithm)
+        except ValueError as e:
+            print(f"Error: Invalid key - {e}", file=sys.stderr)
+            return 1
+        
+        # Вычисляем HMAC
+        hmac_value = hmac.compute_file(args.input)
+        
+        # Если требуется верификация
+        if args.verify:
+            try:
+                with open(args.verify, 'r') as f:
+                    expected_line = f.read().strip()
+                
+                # Парсим ожидаемое значение HMAC
+                # Формат: HMAC_VALUE INPUT_FILE_PATH
+                parts = expected_line.split()
+                if parts:
+                    expected_hmac = parts[0].strip()
+                    
+                    # Сравниваем
+                    if hmac_value == expected_hmac:
+                        print(f"[OK] HMAC verification successful")
+                        return 0
+                    else:
+                        print(f"[ERROR] HMAC verification failed")
+                        return 1
+                else:
+                    print(f"Error: Invalid HMAC file format", file=sys.stderr)
+                    return 1
+                    
+            except FileNotFoundError:
+                print(f"Error: HMAC file '{args.verify}' not found", file=sys.stderr)
+                return 1
+        
+        # Формируем вывод в формате: HMAC_VALUE INPUT_FILE_PATH
+        output = f"{hmac_value} {args.input}"
+        
+    else:
+        # Обычное хэширование (из предыдущего спринта)
+        hash_obj = SHA256()
+        
+        with open(args.input, 'rb') as f:
+            while chunk := f.read(4096):
+                hash_obj.update(chunk)
+        
+        output = f"{hash_obj.hexdigest()} {args.input}"
+    
+    # Записываем вывод
+    if args.output:
+        with open(args.output, 'w') as f:
+            f.write(output + '\n')
+    else:
+        print(output)
+    
+    return 0
+
+def main():
+    parser = setup_parser()
     args = parser.parse_args()
     
-    # Валидация для дешифрования - ключ обязателен
-    if args.decrypt and not args.key:
-        print("Error: --key argument is required for decryption", file=sys.stderr)
-        sys.exit(1)
+    if not args.command:
+        parser.print_help()
+        return 1
     
-    # Валидация ключа если предоставлен
-    if args.key:
-        try:
-            key_bytes = bytes.fromhex(args.key)
-            if len(key_bytes) != 16:
-                raise ValueError("AES-128 key must be 16 bytes (32 hex characters)")
-            
-            # Проверка на слабый ключ
-            if is_weak_key(key_bytes):
-                print(f"Warning: The provided key may be weak: {args.key}", file=sys.stderr)
-                
-        except ValueError as e:
-            print(f"Error: Invalid key format - {e}", file=sys.stderr)
-            sys.exit(1)
+    if args.command == 'dgst':
+        return dgst_command(args)
     
-    # Валидация IV
-    if args.iv:
-        if args.encrypt:
-            print("Warning: IV provided during encryption - it will be ignored", file=sys.stderr)
-        else:
-            try:
-                iv_bytes = bytes.fromhex(args.iv)
-                if len(iv_bytes) != 16:
-                    raise ValueError("IV must be 16 bytes (32 hex characters)")
-            except ValueError as e:
-                print(f"Error: Invalid IV format - {e}", file=sys.stderr)
-                sys.exit(1)
-    
-    # Генерация имени выходного файла по умолчанию
-    if not args.output:
-        args.output = generate_output_filename(args.input, args.encrypt, args.mode)
-    
-    return args
+    return 0
 
-def generate_output_filename(input_file, is_encrypt, mode):
-    if is_encrypt:
-        return f"{input_file}.{mode}.enc"
-    else:
-        if input_file.endswith(f'.{mode}.enc'):
-            return input_file.replace(f'.{mode}.enc', f'.{mode}.dec')
-        else:
-            return f"{input_file}.dec"
