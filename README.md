@@ -155,8 +155,18 @@ cryptocore dgst --algorithm sha256 --hmac --key 00112233445566778899aabbccddeeff
 HMAC_VALUE INPUT_FILE_PATH
 Пример
 a1b2c3d4e5f6012345678901234567890123456789012345678901234567890123 message.txt
+
 ### Тестовые векторы
 RFC 4231 Test Case 1
 echo -n "Hi There" > test.txt
 cryptocore dgst --algorithm sha256 --hmac --key 0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b --input test.txt
 Ожидаемый результат: b0344c61d8db38535ca8afceaf0bf12b881dc200c9833da726e9376c2e32cff7
+### Безопасность
+HMAC обеспечивает:
+Целостность данных
+Аутентификацию источника
+Защиту от подделки
+Ключевые свойства:
+Использует SHA-256 в качестве базовой хэш-функции
+Поддерживает ключи произвольной длины
+Устойчив к атакам на удлинение сообщений
