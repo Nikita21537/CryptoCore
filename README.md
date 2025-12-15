@@ -130,4 +130,33 @@ echo -n "abc" | python src/main.py dgst --algorithm sha256 --input -
 - Реализация BLAKE2b с поддержкой различных размеров
 - Подробные тесты для новых алгоритмов
 - Документация и примеры использования
-  
+# HMAC (Hash-based Message Authentication Code)
+
+## Описание
+HMAC - это механизм для проверки целостности и подлинности сообщений с использованием криптографических хэш-функций.
+
+## Использование
+
+### Генерация HMAC
+
+cryptocore dgst --algorithm sha256 --hmac --key <ключ> --input <файл>  
+пример
+cryptocore dgst --algorithm sha256 --hmac --key 00112233445566778899aabbccddeeff --input message.txt
+### Верефикация HMAC
+cryptocore dgst --algorithm sha256 --hmac --key <ключ> --input <файл> --verify <файл_с_hmac>
+пример
+cryptocore dgst --algorithm sha256 --hmac --key 00112233445566778899aabbccddeeff --input message.txt --verify expected_hmac.txt
+### Параметры
+--hmac: Включить режим HMAC
+--key KEY: Ключ для HMAC (шестнадцатеричная строка)
+--verify FILE: Файл с ожидаемым значением HMAC для верификации
+### Формат вывода
+При генерации HMAC вывод имеет формат:
+HMAC_VALUE INPUT_FILE_PATH
+Пример
+a1b2c3d4e5f6012345678901234567890123456789012345678901234567890123 message.txt
+### Тестовые векторы
+RFC 4231 Test Case 1
+echo -n "Hi There" > test.txt
+cryptocore dgst --algorithm sha256 --hmac --key 0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b --input test.txt
+Ожидаемый результат: b0344c61d8db38535ca8afceaf0bf12b881dc200c9833da726e9376c2e32cff7
