@@ -170,3 +170,17 @@ HMAC обеспечивает:
 Использует SHA-256 в качестве базовой хэш-функции
 Поддерживает ключи произвольной длины
 Устойчив к атакам на удлинение сообщений
+## Инструкции по установке и тестированию:
+Скопируйте файлы в соответствующие директории вашего проекта.
+Запустите тесты:
+# Запуск unit тестов
+python -m pytest tests/test_hmac.py -v
+# Запуск интеграционных тестов
+python -m pytest tests/integration/test_cli_hmac.py -v
+# Запуск тестовых векторов
+python tests/test_hmac_vectors.py
+Пример использования:
+# Генерация HMAC
+python -m src.cli dgst --algorithm sha256 --hmac --key 00112233445566778899aabbccddeeff --input README.md
+# Верификация HMAC
+python -m src.cli dgst --algorithm sha256 --hmac --key 00112233445566778899aabbccddeeff --input README.md --verify hmac.txt
