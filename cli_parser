@@ -1,0 +1,128 @@
+import argparse
+import sys
+import os
+
+
+def parse_arguments():
+    parser = argparse.ArgumentParser(
+        description='CryptoCore - Cryptographic Tool',
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+
+    subparsers = parser.add_subparsers(dest='command', help='Subcommands')
+
+    # Encryption/decryption parser
+    enc_parser = subparsers.add_parser('encrypt', help='Encryption/decryption operations')
+
+    enc_parser.add_argument('--algorithm', '-a',
+                            choices=['aes'],
+                            default='aes',
+                            help='Encryption algorithm (default: aes)')
+
+    enc_parser.add_argument('--mode', '-m',
+                            choices=['ecb', 'cbc', 'cfb', 'ofb', 'ctr', 'gcm'],
+                            default='ecb',
+                            help='Block cipher mode (default: ecb)')
+
+    enc_parser.add_argument('--key', '-k',
+                            help='Encryption key as hex string (optional for encryption)')
+
+    group = enc_parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('--encrypt', '-e',
+                       action='store_true',
+                       help='Encrypt mode')
+    group.add_argument('--decrypt', '-d',
+                       action='store_true',
+                       help='Decrypt mode')
+
+    enc_parser.add_argument('--input', '-i',
+                            required=True,
+                            help='Input file path')
+
+    enc_parser.add_argument('--output', '-o',
+                            required=True,
+                            help='Output file path')
+
+    enc_parser.add_argument('--iv',
+                            help='Initialization Vector or Nonce as hex string')
+
+    enc_parser.add_argument('--aad',
+                            help='Associated Authenticated Data as hex string (for GCM mode)')
+
+    enc_parser.add_argument('--verbose', '-v',
+                            action='store_true',
+                            help='Verbose output')
+
+    # Digest parser
+    dgst_parser = subparsers.add_parser('dgst', help='Hash digest operations')
+
+    dgst_parser.add_argument('--algorithm', '-a',
+                             choices=['sha256', 'sha3-256', 'blake2b'],
+                             default='sha256',
+                             help='Hash algorithm (default: sha256)')
+
+    dgst_parser.add_argument('--input', '-i',
+                             required=True,
+                             help='Input file path (use "-" for stdin)')
+
+    dgst_parser.add_argument('--output', '-o',
+                             help='Output file for hash')
+
+    dgst_parser.add_argument('--hmac',
+                             action='store_true',
+                             help='Use HMAC mode')
+
+    dgst_parser.add_argument('--key', '-k',
+                             help='Key for HMAC (hex string)')
+
+    dgst_parser.add_argument('--verify',
+                             help='Verify against hash in file')
+
+    return parser.parse_args()
+
+
+def validate_arguments(args):
+    errors = []
+
+    # Only validate for encryption/decryption
+    if not hasattr(args, 'command') or args.command != 'encrypt':
+        return args
+
+    if args.key:
+        try:
+            key_bytes = bytes.fromhex(args.key)
+            if len(key_bytes) not in (16, 24, 32):
+                errors.append("Key must be 16, 24, or 32 bytes (32, 48, or 64 hex chars)")
+        except ValueError:
+            errors.append("Key must be a valid hex string")
+
+    if args.mode in ['cbc', 'cfb', 'ofb', 'ctr'] and args.decrypt and not args.iv:
+        errors.append(f"{args.mode.upper()} mode decryption requires --iv")
+
+    if args.mode == 'gcm' and args.iv:
+        try:
+            iv_bytes = bytes.fromhex(args.iv)
+            if len(iv_bytes) != 12:
+                errors.append("GCM nonce must be 12 bytes (24 hex chars)")
+        except ValueError:
+            errors.append("IV/Nonce must be a valid hex string")
+
+    if args.aad:
+        try:
+            aad_bytes = bytes.fromhex(args.aad)
+        except ValueError:
+            errors.append("AAD must be a valid hex string")
+
+    if errors:
+        print("Argument errors:", file=sys.stderr)
+        for error in errors:
+            print(f"  - {error}", file=sys.stderr)
+        sys.exit(1)
+
+    return args
+
+
+def hex_to_bytes_or_empty(hex_str):
+    if not hex_str:
+        return b""
+    return bytes.fromhex(hex_str)
