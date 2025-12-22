@@ -1,0 +1,218 @@
+import subprocess
+import tempfile
+import os
+import sys
+
+
+class TestCLISHA3:
+
+    
+    def test_cli_sha3_256_basic(self):
+        
+        with tempfile.NamedTemporaryFile(mode='w', delete=False) as f:
+            f.write("hello world")
+            input_file = f.name
+        
+        try:
+            result = subprocess.run(
+                [sys.executable, '-m', 'cryptocore.cli', 
+                 '--algorithm', 'sha3_256',
+                 '--input', input_file],
+                capture_output=True,
+                text=True,
+                timeout=10
+            )
+            
+            assert result.returncode == 0
+            # Проверяем, что вывод - валидный hex
+            output = result.stdout.strip()
+            assert len(output) == 64  # 32 байта в hex
+            assert all(c in '0123456789abcdef' for c in output.lower())
+            
+        finally:
+            os.unlink(input_file)
+    
+    def test_cli_sha3_256_stdin(self):
+ 
+        result = subprocess.run(
+            [sys.executable, '-m', 'cryptocore.cli',
+             '--algorithm', 'sha3_256',
+             '--input', '-'],
+            input=b'test data',
+            capture_output=True,
+            text=True,
+            timeout=10
+        )
+        
+        assert result.returncode == 0
+        output = result.stdout.strip()
+        assert len(output) == 64
+    
+    def test_cli_sha3_256_file_output(self):
+       
+        with tempfile.NamedTemporaryFile(mode='w', delete=False) as f:
+            f.write("test")
+            input_file = f.name
+        
+        output_file = input_file + '.hash'
+        
+        try:
+            result = subprocess.run(
+                [sys.executable, '-m', 'cryptocore.cli',
+                 '--algorithm', 'sha3_256',
+                 '--input', input_file,
+                 '--output', output_file],
+                capture_output=True,
+                text=True,
+                timeout=10
+            )
+            
+            assert result.returncode == 0
+            assert os.path.exists(output_file)
+            
+            with open(output_file, 'r') as f:
+                hash_value = f.read().strip()
+                assert len(hash_value) == 64
+            
+        finally:
+            for f in [input_file, output_file]:
+                if os.path.exists(f):
+                    os.unlink(f)
+    
+    def test_cli_hmac_sha3_256(self):
+       
+        with tempfile.NamedTemporaryFile(mode='w', delete=False) as f:
+            f.write("message to authenticate")
+            input_file = f.name
+        
+        try:
+            result = subprocess.run(
+                [sys.executable, '-m', 'cryptocore.cli',
+                 '--algorithm', 'hmac',
+                 '--hash', 'sha3_256',
+                 '--key', 'secret_key',
+                 '--input', input_file],
+                capture_output=True,
+                text=True,
+                timeout=10
+            )
+            
+            assert result.returncode == 0
+            output = result.stdout.strip()
+            assert len(output) == 64
+            
+        finally:
+            os.unlink(input_file)
+    
+    def test_cli_hmac_sha3_256_verify(self):
+        
+        with tempfile.NamedTemporaryFile(mode='w', delete=False) as f:
+            f.write("test message")
+            input_file = f.name
+        
+        try:
+            # Сначала получаем HMAC
+            result = subprocess.run(
+                [sys.executable, '-m', 'cryptocore.cli',
+                 '--algorithm', 'hmac',
+                 '--hash', 'sha3_256',
+                 '--key', 'mykey',
+                 '--input', input_file],
+                capture_output=True,
+                text=True,
+                timeout=10
+            )
+            
+            assert result.returncode == 0
+            hmac_value = result.stdout.strip()
+            
+            # Затем проверяем его
+            result = subprocess.run(
+                [sys.executable, '-m', 'cryptocore.cli',
+                 '--algorithm', 'hmac',
+                 '--hash', 'sha3_256',
+                 '--key', 'mykey',
+                 '--input', input_file,
+                 '--verify', hmac_value],
+                capture_output=True,
+                text=True,
+                timeout=10
+            )
+            
+            assert result.returncode == 0
+            assert "successful" in result.stdout
+            
+        finally:
+            os.unlink(input_file)
+    
+    def test_cli_hmac_sha3_256_verify_failure(self):
+     
+        with tempfile.NamedTemporaryFile(mode='w', delete=False) as f:
+            f.write("message")
+            input_file = f.name
+        
+        try:
+            # Пробуем проверить неверный HMAC
+            result = subprocess.run(
+                [sys.executable, '-m', 'cryptocore.cli',
+                 '--algorithm', 'hmac',
+                 '--hash', 'sha3_256',
+                 '--key', 'key',
+                 '--input', input_file,
+                 '--verify', '0' * 64],  # Неверный HMAC
+                capture_output=True,
+                text=True,
+                timeout=10
+            )
+            
+            # Должен вернуть код ошибки
+            assert result.returncode != 0
+            assert "failed" in result.stdout
+            
+        finally:
+            os.unlink(input_file)
+    
+    def test_cli_algorithm_comparison(self):
+       
+        test_data = b"comparison test"
+        
+        with tempfile.NamedTemporaryFile(mode='wb', delete=False) as f:
+            f.write(test_data)
+            input_file = f.name
+        
+        try:
+            # SHA256
+            result_sha256 = subprocess.run(
+                [sys.executable, '-m', 'cryptocore.cli',
+                 '--algorithm', 'sha256',
+                 '--input', input_file],
+                capture_output=True,
+                text=True,
+                timeout=10
+            )
+            
+            # SHA3-256
+            result_sha3_256 = subprocess.run(
+                [sys.executable, '-m', 'cryptocore.cli',
+                 '--algorithm', 'sha3_256',
+                 '--input', input_file],
+                capture_output=True,
+                text=True,
+                timeout=10
+            )
+            
+            assert result_sha256.returncode == 0
+            assert result_sha3_256.returncode == 0
+            
+            hash_sha256 = result_sha256.stdout.strip()
+            hash_sha3_256 = result_sha3_256.stdout.strip()
+            
+            # Хеши должны быть разные
+            assert hash_sha256 != hash_sha3_256
+            
+            # Оба должны быть валидными hex строками
+            assert len(hash_sha256) == 64
+            assert len(hash_sha3_256) == 64
+            
+        finally:
+            os.unlink(input_file)
