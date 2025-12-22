@@ -507,3 +507,4 @@ def test_cli_encrypt_decrypt():
         for file in [input_file, encrypted_file, decrypted_file]:
             if os.path.exists(file):
                 os.unlink(file)
+1
