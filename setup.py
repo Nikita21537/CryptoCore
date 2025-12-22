@@ -8,6 +8,10 @@ setup(
     entry_points={
         'console_scripts': [
             'cryptocore=src.cli:main',
+               'pytest>=7.0',],
+                 'test': [
+               'pytest>=7.0',
+              'pytest-cov>=4.0',          
         ],
     },
     test_suite="tests",
