@@ -1,0 +1,17 @@
+
+
+from .sha3 import sha3_256, sha3_256_hex
+import hashlib
+
+def sha256(data: bytes) -> bytes:
+
+    return hashlib.sha256(data).digest()
+
+
+def sha256_hex(data: bytes) -> str:
+   
+    return hashlib.sha256(data).hexdigest()
+
+
+# Экспорт SHA3-256 функций
+__all__ = ['sha256', 'sha256_hex', 'sha3_256', 'sha3_256_hex']
