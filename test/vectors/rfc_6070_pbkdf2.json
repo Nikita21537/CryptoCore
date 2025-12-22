@@ -1,0 +1,34 @@
+[
+  {
+    "description": "RFC 6070 Test Case 1",
+    "password": "70617373776f7264",
+    "salt": "73616c74",
+    "iterations": 1,
+    "dklen": 20,
+    "key": "0c60c80f961f0e71f3a9b524af6012062fe037a6"
+  },
+  {
+    "description": "RFC 6070 Test Case 2",
+    "password": "70617373776f7264",
+    "salt": "73616c74",
+    "iterations": 2,
+    "dklen": 20,
+    "key": "ea6c014dc72d6f8ccd1ed92ace1d41f0d8de8957"
+  },
+  {
+    "description": "RFC 6070 Test Case 3",
+    "password": "70617373776f7264",
+    "salt": "73616c74",
+    "iterations": 4096,
+    "dklen": 20,
+    "key": "4b007901b765489abead49d926f721d065a429c1"
+  },
+  {
+    "description": "RFC 6070 Test Case 4",
+    "password": "70617373776f726450415353574f524470617373776f7264",
+    "salt": "73616c7453414c5473616c7453414c5473616c7453414c5473616c7453414c5473616c74",
+    "iterations": 4096,
+    "dklen": 25,
+    "key": "3d2eec4fe41c849b80c8d83662c0e44a8b291a964cf2f07038"
+  }
+]
