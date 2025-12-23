@@ -6,11 +6,11 @@ import json
 # Add src to path for imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../..'))
 
-from src.cryptocore.modes.ecb import AES_ECB, PKCS7Padding
-from src.cryptocore.modes.cbc import AES_CBC
-from src.cryptocore.modes.cfb import AES_CFB
-from src.cryptocore.modes import AES_OFB
-from src.cryptocore.modes.ctr import AES_CTR
+from src.modes.ecb import AES_ECB, PKCS7Padding
+from src.modes.cbc import AES_CBC
+from src.modes.cfb import AES_CFB
+from src.modes import AES_OFB
+from src.modes.ctr import AES_CTR
 
 
 class TestPKCS7Padding(unittest.TestCase):
@@ -406,4 +406,5 @@ class TestErrorHandling(unittest.TestCase):
 
 
 if __name__ == '__main__':
+
     unittest.main()
