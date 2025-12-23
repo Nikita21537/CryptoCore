@@ -1,0 +1,32 @@
+{
+  "ECB": [
+    {
+      "description": "NIST ECB test vector 1",
+      "key": "000102030405060708090a0b0c0d0e0f",
+      "plaintext": "00112233445566778899aabbccddeeff",
+      "ciphertext": "69c4e0d86a7b0430d8cdb78070b4c55a"
+    },
+    {
+      "description": "NIST ECB test vector 2",
+      "key": "000102030405060708090a0b0c0d0e0f",
+      "plaintext": "00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff",
+      "ciphertext": "69c4e0d86a7b0430d8cdb78070b4c55a69c4e0d86a7b0430d8cdb78070b4c55a"
+    }
+  ],
+  "CBC": [
+    {
+      "description": "NIST CBC test vector 1",
+      "key": "000102030405060708090a0b0c0d0e0f",
+      "iv": "000102030405060708090a0b0c0d0e0f",
+      "plaintext": "00112233445566778899aabbccddeeff",
+      "ciphertext": "7649abac8119b246cee98e9b12e9197d"
+    },
+    {
+      "description": "NIST CBC test vector 2",
+      "key": "000102030405060708090a0b0c0d0e0f",
+      "iv": "000102030405060708090a0b0c0d0e0f",
+      "plaintext": "00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff",
+      "ciphertext": "7649abac8119b246cee98e9b12e9197d5086cb9b507219ee95db113a917678b2"
+    }
+  ]
+}
