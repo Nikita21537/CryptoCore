@@ -2,7 +2,7 @@ import unittest
 import os
 import tempfile
 import subprocess
-from src.cryptocore.modes import create_mode
+from src.modes import create_mode
 
 
 class TestNewModes(unittest.TestCase):
@@ -141,4 +141,5 @@ class TestNewModes(unittest.TestCase):
 
 
 if __name__ == '__main__':
+
     unittest.main()
