@@ -1,6 +1,69 @@
 ## CryptoCore - AES-128 ECB Инструмент Шифрования/Расшифровки
 # Инструмент командной строки для режима AES-128 ECB шифрования и расшифровки с PKCS#7 дополнением.
 
+
+
+
+## Инструкции по сборке
+sudo apt install git
+
+sudo apt update
+
+sudo apt install python3-venv python3-pip python3-full
+
+git clone https://github.com/kdqwrt/cryptocore.git
+
+python3 -m venv venv
+
+source venv/bin/activate
+
+cd cryptocore
+
+dir 
+
+pip install --upgrade pip
+
+pip install -e .
+
+pip install setuptools wheel
+
+python all_tests.py
+## Команды
+echo "Тестовые данные" > test.txt
+
+cryptocore encrypt --mode gcm --encrypt --input test.txt --output test.enc
+cryptocore encrypt --mode gcm --decrypt --key @ВАШ_КЛЮЧ --input test.enc --output test_decrypted.txt
+cat test_decrypted.txt
+## Основные команды
+## Шифрование GCM
+
+cryptocore encrypt --mode gcm --encrypt --key @00112233445566778899aabbccddeeff --input файл.txt --output файл.enc
+cryptocore encrypt --mode gcm --decrypt --key @00112233445566778899aabbccddeeff --input файл.enc --output файл.txt
+## Шифрование GCM с AAD
+
+cryptocore encrypt --mode gcm --encrypt --key @ключ --input данные.txt --output данные.enc --aad 0102030405
+cryptocore encrypt --mode gcm --decrypt --key @ключ --input данные.enc --output данные.txt --aad 0102030405
+## Другие режимы шифрования
+
+cryptocore encrypt --mode cbc --encrypt --key @ключ --input файл.txt --output файл.enc
+cryptocore encrypt --mode ctr --encrypt --key @ключ --input файл.txt --output файл.enc
+cryptocore encrypt --mode ecb --encrypt --key @ключ --input файл.txt --output файл.enc
+## Хеширование файлов
+
+cryptocore dgst --algorithm sha256 --input файл.iso
+cryptocore dgst --algorithm sha3-256 --input файл.iso
+cryptocore dgst --algorithm sha256 --input файл1.txt файл2.txt файл3.txt
+## HMAC подписи
+
+cryptocore dgst --algorithm sha256 --hmac --key 00112233445566778899aabbccddeeff --input файл.txt
+cryptocore dgst --algorithm sha256 --hmac --key ключ --input файл.txt --verify файл.hmac
+## Работа с ключами
+
+python3 -c "import os; print('@' + os.urandom(16).hex())"
+cryptocore derive --password "пароль" --salt a1b2c3d4e5f6 --iterations 100000 --length 16
+
+
+
 # Инструкции по сборке
 Используя pip:
 pip install -e .
@@ -1884,4 +1947,5 @@ cat docs/DEVELOPMENT.md | head -50
 # Запустите примеры:
 
 python examples/basic_usage.py
+
 
