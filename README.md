@@ -42,6 +42,60 @@ echo "Another test file for encryption testing." > data.txt
 
 echo "Sensitive data that needs protection." > secret.txt
 
+
+
+### Перед началом
+1. Установите инструмент: pip install -e .
+2. Создайте тестовый файл:
+echo "This is a secret message for testing AES modes." > secret.txt
+### 1. Режим ECB (Electronic Codebook)
+
+# Шифрование (ключ 128 бит = 32 hex символа)
+cryptocore enc --algorithm aes --mode ecb --encrypt --key 000102030405060708090a0b0c0d0e0f --input secret.txt --output ecb_enc.bin
+
+# Расшифровка
+cryptocore enc --algorithm aes --mode ecb --decrypt --key 000102030405060708090a0b0c0d0e0f --input ecb_enc.bin --output ecb_dec.txt
+### 2. Режим CBC (Cipher Block Chaining)
+
+# Шифрование (ключ 256 бит = 64 hex символа)
+cryptocore enc --algorithm aes --mode cbc --encrypt --key 000102030405060708090a0b0c0d0e0f1112131415161718191a1b1c1d1e1f20 --input secret.txt --output cbc_enc.bin
+
+# Расшифровка (используйте тот же ключ)
+cryptocore enc --algorithm aes --mode cbc --decrypt --key 000102030405060708090a0b0c0d0e0f1112131415161718191a1b1c1d1e1f20 --input cbc_enc.bin --output cbc_dec.txt
+### 3. Режим CTR (Counter)
+Потоковый режим, не требует дополнения (padding).
+# Шифрование
+cryptocore enc --algorithm aes --mode ctr --encrypt --key 000102030405060708090a0b0c0d0e0f --input secret.txt --output ctr_enc.bin
+
+# Расшифровка (процесс идентичен шифрованию)
+cryptocore enc --algorithm aes --mode ctr --decrypt --key 000102030405060708090a0b0c0d0e0f --input ctr_enc.bin --output ctr_dec.txt
+### 4. Режим GCM (Galois/Counter Mode)
+# ШИФРОВАНИЕ с AAD (дополнительные аутентифицированные данные)
+cryptocore encrypt --mode gcm --encrypt --key @00112233445566778899aabbccddeeff --input secret.txt --output gcm_enc.bin --aad 0102030405
+
+# РАСШИФРОВКА (обязательно укажите тот же ключ И тот же AAD)
+cryptocore encrypt --mode gcm --decrypt --key @00112233445566778899aabbccddeeff --input gcm_enc.bin --output gcm_dec.txt --aad 0102030405
+Ключевые отличия GCM:
+- Используется префикс @ перед ключом
+- Команда encrypt вместо enc
+- Обязательное совпадение AAD при расшифровке
+
+### Проверка результатов
+После каждой расшифровки проверяйте, что исходный и расшифрованный файлы идентичны:
+# Linux/macOS
+diff secret.txt ecb_dec.txt
+
+# Windows
+fc secret.txt ecb_dec.txt
+### Важные замечания по безопасности
+
+
+Если какой-то из форматов команд не работает, проверьте справку:
+cryptocore --help
+# или
+cryptocore enc --help
+
+
 # Создайте бинарный файл для теста (1KB)
 fsutil file createnew data.bin 1024  # Windows
 # или
@@ -2130,6 +2184,7 @@ cat docs/DEVELOPMENT.md | head -50
 # Запустите примеры:
 
 python examples/basic_usage.py
+
 
 
 
