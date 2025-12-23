@@ -4,8 +4,8 @@ import tempfile
 import subprocess
 import sys
 import time
-from src.cryptocore.kdf.pbkdf2 import pbkdf2_hmac_sha256
-from src.cryptocore.kdf import derive_key
+from src.kdf.pbkdf2 import pbkdf2_hmac_sha256
+from src.kdf import derive_key
 
 
 class TestPBKDF2(unittest.TestCase):
@@ -488,4 +488,5 @@ class TestInteroperability(unittest.TestCase):
 
 if __name__ == '__main__':
     print("Running KDF tests...")
+
     unittest.main(verbosity=2)
