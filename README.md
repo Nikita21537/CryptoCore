@@ -1,283 +1,280 @@
-# CryptoCore - AES-128 ECB Encryption/Decryption Tool
+## CryptoCore - AES-128 ECB Инструмент Шифрования/Расшифровки
+# Инструмент командной строки для режима AES-128 ECB шифрования и расшифровки с PKCS#7 дополнением.
 
-A command-line tool for AES-128 ECB mode encryption and decryption with PKCS#7 padding.
-
-## Build Instructions
-
-### Using pip:
-
+# Инструкции по сборке
+Используя pip:
 pip install -e .
-### Manual installation:
 
+# Ручная установка:
 pip install -r requirements.txt
 
-## Usage Instructions
-### Encryption:
-cryptocore --algorithm aes --mode ecb --encrypt \
-           --key 000102030405060708090a0b0c0d0e0f \
-           --input plaintext.txt \
-           --output ciphertext.bin
-### Decryption:
-cryptocore --algorithm aes --mode ecb --decrypt \
-           --key 000102030405060708090a0b0c0d0e0f \
-           --input ciphertext.bin \
-           --output decrypted.txt
-### Dependencies
-  Python 3.6 or higher
+# Инструкции по использованию
+Шифрование:
+cryptocore --algorithm aes --mode ecb --encrypt
+--key 000102030405060708090a0b0c0d0e0f
+--input plaintext.txt
+--output ciphertext.bin
 
-  pycryptodome library (pip install pycryptodome)
-### Project Structure[cryptocore.py](src/cryptocore/cryptocore.py)
-[csprng.py](src/cryptocore/csprng.py)
-[file_io.py](src/cryptocore/file_io.py)
-[cli_parser.py](src/cryptocore/cli_parser.py)
+# Расшифровка:
+cryptocore --algorithm aes --mode ecb --decrypt
+--key 000102030405060708090a0b0c0d0e0f
+--input ciphertext.bin
+--output decrypted.txt
+
+# Зависимости
+Python 3.6 или выше
+
+библиотека pycryptodome (pip install pycryptodome)
+
+#Структура проектаcryptocore.py
+csprng.py
+file_io.py
+cli_parser.py
 cryptocore/
-├── src/                    
-│   ├── cli_parser.py      
-│   ├── file_io.py         
-│   ├── modes/            
-│   │   └── ecb.py         
-│   └── cryptocore.py     
-├── tests/                
-├── requirements.txt        
-├── setup.py               
-└── README.md              
-### Testing
-## Run the test suite:
+├── src/
+│ ├── cli_parser.py
+│ ├── file_io.py
+│ ├── modes/
+│ │ └── ecb.py
+│ └── cryptocore.py
+├── tests/
+├── requirements.txt
+├── setup.py
+└── README.md
 
+# Тестирование
+Запустите набор тестов:
+make test
 
-### make test
-## Or directly:
-  python -m pytest tests/
-### Round-trip test:
-
-# Create a test file
-echo "Hello, CryptoCore!" > test.txt
-
-# Encrypt it
-cryptocore --algorithm aes --mode ecb --encrypt \
-           --key 000102030405060708090a0b0c0d0e0f \
-           --input test.txt \
-           --output test.enc
-
-# Decrypt it
-cryptocore --algorithm aes --mode ecb --decrypt \
-           --key 000102030405060708090a0b0c0d0e0f \
-           --input test.enc \
-           --output test.dec
-
-# Verify
-diff test.txt test.dec  # Should show no differences
-Verification with OpenSSL
-To verify the implementation against OpenSSL:
-
-
-# Encrypt with CryptoCore
-cryptocore --algorithm aes --mode ecb --encrypt \
-           --key 000102030405060708090a0b0c0d0e0f \
-           --input plaintext.txt \
-           --output cryptocore.bin
-
-# Encrypt with OpenSSL (for files that are multiple of 16 bytes)
-openssl enc -aes-128-ecb \
-           -K 000102030405060708090a0b0c0d0e0f \
-           -in plaintext.txt \
-           -out openssl.bin \
-           -nopad
-
-# Compare (for files exactly multiple of 16 bytes)
-cmp cryptocore.bin openssl.bin
-Note: OpenSSL with -nopad only works for files exactly multiple of 16 bytes. CryptoCore automatically handles PKCS#7 padding for arbitrary length files.
-
-text
-
-## 4. Инструкции по запуску
-
-1. **Создайте структуру проекта:**
-
- mkdir -p cryptocore/src/modes cryptocore/tests
- Скопируйте все файлы в соответствующие директории
-
-## Установите зависимости:
-
-cd cryptocore
-pip install -r requirements.txt
-## Установите пакет:
-
-pip install -e .
-## Протестируйте:
-
-
-# Тесты
+# Или напрямую:
 python -m pytest tests/
 
-# Пример использования
+# Тест на полный цикл:
+Создайте тестовый файл
+echo "Hello, CryptoCore!" > test.txt
+
+# Зашифруйте его
+cryptocore --algorithm aes --mode ecb --encrypt
+--key 000102030405060708090a0b0c0d0e0f
+--input test.txt
+--output test.enc
+
+# Расшифруйте его
+cryptocore --algorithm aes --mode ecb --decrypt
+--key 000102030405060708090a0b0c0d0e0f
+--input test.enc
+--output test.dec
+
+Проверьте
+diff test.txt test.dec # Не должно быть различий
+
+Проверка с помощью OpenSSL
+Для проверки реализации в сравнении с OpenSSL:
+
+# Зашифруйте с помощью CryptoCore
+cryptocore --algorithm aes --mode ecb --encrypt
+--key 000102030405060708090a0b0c0d0e0f
+--input plaintext.txt
+--output cryptocore.bin
+
+Зашифруйте с помощью OpenSSL (для файлов кратных 16 байтам)
+openssl enc -aes-128-ecb
+-K 000102030405060708090a0b0c0d0e0f
+-in plaintext.txt
+-out openssl.bin
+-nopad
+
+Сравните (для файлов кратных 16 байтам)
+cmp cryptocore.bin openssl.bin
+
+Примечание: OpenSSL с параметром -nopad работает только для файлов, размер которых кратен 16 байтам. CryptoCore автоматически обрабатывает PKCS#7 дополнение для файлов произвольной длины.
+
+
+
+# 4. Инструкции по запуску
+Создайте структуру проекта:
+
+mkdir -p cryptocore/src/modes cryptocore/tests
+Скопируйте все файлы в соответствующие директории
+
+# Установите зависимости:
+cd cryptocore
+pip install -r requirements.txt
+
+# Установите пакет:
+pip install -e .
+
+Протестируйте:
+Тесты
+python -m pytest tests/
+
+Пример использования
 echo "Hello, World!" > test.txt
 
-cryptocore --algorithm aes --mode ecb --encrypt \
-           --key 000102030405060708090a0b0c0d0e0f \
-           --input test.txt \
-           --output test.enc
+cryptocore --algorithm aes --mode ecb --encrypt
+--key 000102030405060708090a0b0c0d0e0f
+--input test.txt
+--output test.enc
 
-cryptocore --algorithm aes --mode ecb --decrypt \
-           --key 000102030405060708090a0b0c0d0e0f \
-           --input test.enc \
-           --output test.dec
+cryptocore --algorithm aes --mode ecb --decrypt
+--key 000102030405060708090a0b0c0d0e0f
+--input test.enc
+--output test.dec
 
-diff test.txt test.dec  # Должно быть пусто
-# CryptoCore - AES-128 Encryption/Decryption Tool
+diff test.txt test.dec # Должно быть пусто
 
-A command-line tool for AES-128 encryption and decryption supporting multiple modes:
-ECB, CBC, CFB, OFB, and CTR with PKCS#7 padding where required.
+CryptoCore - AES-128 Инструмент Шифрования/Расшифровки
+Инструмент командной строки для AES-128 шифрования и расшифровки с поддержкой нескольких режимов:
+ECB, CBC, CFB, OFB и CTR с PKCS#7 дополнением, где это требуется.
 
-## Build Instructions
-
-### Using pip:
+# Инструкции по сборке
+Используя pip:
 pip install -e .
-### Manual installation:
 
+Ручная установка:
 pip install -r requirements.txt
-## Usage Instructions
-### For modes requiring IV (CBC, CFB, OFB, CTR):
-### Encryption (IV is auto-generated):
 
-cryptocore --algorithm aes --mode cbc --encrypt \
-           --key 000102030405060708090a0b0c0d0e0f \
-           --input plaintext.txt \
-           --output ciphertext.bin
-The generated IV is automatically prepended to the ciphertext file.
+# Инструкции по использованию
+Для режимов, требующих IV (CBC, CFB, OFB, CTR):
+Шифрование (IV генерируется автоматически):
+cryptocore --algorithm aes --mode cbc --encrypt
+--key 000102030405060708090a0b0c0d0e0f
+--input plaintext.txt
+--output ciphertext.bin
 
-### Decryption with explicit IV:
+# Сгенерированный IV автоматически добавляется в начало файла с шифртекстом.
 
-cryptocore --algorithm aes --mode cbc --decrypt \
-           --key 000102030405060708090a0b0c0d0e0f \
-           --iv AABBCCDDEEFF00112233445566778899 \
-           --input ciphertext.bin \
-           --output decrypted.txt
-### Decryption without explicit IV (IV read from file):
+Расшифровка с явным указанием IV:
+cryptocore --algorithm aes --mode cbc --decrypt
+--key 000102030405060708090a0b0c0d0e0f
+--iv AABBCCDDEEFF00112233445566778899
+--input ciphertext.bin
+--output decrypted.txt
 
-cryptocore --algorithm aes --mode cbc --decrypt \
-           --key 000102030405060708090a0b0c0d0e0f \
-           --input ciphertext.bin \
-           --output decrypted.txt
-### For ECB mode (no IV):
-## Encryption:
+# Расшифровка без явного указания IV (IV читается из файла):
+cryptocore --algorithm aes --mode cbc --decrypt
+--key 000102030405060708090a0b0c0d0e0f
+--input ciphertext.bin
+--output decrypted.txt
 
-cryptocore --algorithm aes --mode ecb --encrypt \
-           --key 000102030405060708090a0b0c0d0e0f \
-           --input plaintext.txt \
-           --output ciphertext.bin
-## Decryption:
+# Для режима ECB (без IV):
+Шифрование:
+cryptocore --algorithm aes --mode ecb --encrypt
+--key 000102030405060708090a0b0c0d0e0f
+--input plaintext.txt
+--output ciphertext.bin
 
-cryptocore --algorithm aes --mode ecb --decrypt \
-           --key 000102030405060708090a0b0c0d0e0f \
-           --input ciphertext.bin \
-           --output decrypted.txt
-## Dependencies
-Python 3.6 or higher
+Расшифровка:
+cryptocore --algorithm aes --mode ecb --decrypt
+--key 000102030405060708090a0b0c0d0e0f
+--input ciphertext.bin
+--output decrypted.txt
 
-pycryptodome library (pip install pycryptodome)
+Зависимости
+Python 3.6 или выше
 
-OpenSSL (for interoperability testing)
+библиотека pycryptodome (pip install pycryptodome)
 
-Supported Modes
-ECB (Electronic Codebook) - Basic mode, each block encrypted independently
+# OpenSSL (для тестирования совместимости)
 
-CBC (Cipher Block Chaining) - Each block XORed with previous ciphertext
+# Поддерживаемые режимы
+ECB (Electronic Codebook) - Базовый режим, каждый блок шифруется независимо
 
-CFB (Cipher Feedback) - Stream cipher mode, 128-bit segment size
+CBC (Cipher Block Chaining) - Каждый блок XOR-ится с предыдущим шифртекстом
 
-OFB (Output Feedback) - Stream cipher mode, generates keystream
+CFB (Cipher Feedback) - Режим потокового шифра, размер сегмента 128 бит
 
-CTR (Counter) - Stream cipher mode using counter
+OFB (Output Feedback) - Режим потокового шифра, генерирует ключевой поток
 
-## File Format for IV-containing Modes
-# When encrypting with CBC, CFB, OFB, or CTR modes:
+CTR (Counter) - Режим потокового шифра с использованием счетчика
 
+# Формат файла для режимов с IV
+При шифровании в режимах CBC, CFB, OFB или CTR:
+# Формат выходного файла: [16-байтовый IV][Байты шифртекста]
+При расшифровке:
+Если указан --iv: используется предоставленный IV
 
-## Output file format: [16-byte IV][Ciphertext bytes]
-# When decrypting:
+Если --iv не указан: читаются первые 16 байтов как IV из входного файла
 
-If --iv is provided: use provided IV
-
-If --iv is not provided: read first 16 bytes as IV from input file
-
-Interoperability with OpenSSL
-## 1. Encrypt with CryptoCore, Decrypt with OpenSSL:
+Совместимость с OpenSSL
+1. Зашифровать с помощью CryptoCore, расшифровать с помощью OpenSSL:
 bash
-# Encrypt with CryptoCore
-cryptocore --algorithm aes --mode cbc --encrypt \
-           --key 000102030405060708090a0b0c0d0e0f \
-           --input plain.txt --output cipher.bin
 
-# Extract IV and ciphertext
+# Зашифруйте с помощью CryptoCore
+cryptocore --algorithm aes --mode cbc --encrypt
+--key 000102030405060708090a0b0c0d0e0f
+--input plain.txt --output cipher.bin
+
+# Извлеките IV и шифртекст
 dd if=cipher.bin of=iv.bin bs=16 count=1
 dd if=cipher.bin of=ciphertext_only.bin bs=16 skip=1
 
-# Decrypt with OpenSSL
-openssl enc -aes-128-cbc -d \
-            -K 000102030405060708090A0B0C0D0E0F \
-            -iv $(cat iv.bin | xxd -p | tr -d '\n') \
-            -in ciphertext_only.bin \
-            -out decrypted.txt
-## 2. Encrypt with OpenSSL, Decrypt with CryptoCore:
+Расшифруйте с помощью OpenSSL
+openssl enc -aes-128-cbc -d
+-K 000102030405060708090A0B0C0D0E0F
+-iv $(cat iv.bin | xxd -p | tr -d '\n')
+-in ciphertext_only.bin
+-out decrypted.txt
+
+2. Зашифровать с помощью OpenSSL, расшифровать с помощью CryptoCore:
 bash
-# Encrypt with OpenSSL
-openssl enc -aes-128-cbc \
-            -K 000102030405060708090A0B0C0D0E0F \
-            -iv AABBCCDDEEFF00112233445566778899 \
-            -in plain.txt -out openssl_cipher.bin
 
-# Decrypt with CryptoCore
-cryptocore --algorithm aes --mode cbc --decrypt \
-           --key 000102030405060708090a0b0c0d0e0f \
-           --iv AABBCCDDEEFF00112233445566778899 \
-           --input openssl_cipher.bin \
-           --output decrypted.txt
-Testing
-Run the test suite:
+Зашифруйте с помощью OpenSSL
+openssl enc -aes-128-cbc
+-K 000102030405060708090A0B0C0D0E0F
+-iv AABBCCDDEEFF00112233445566778899
+-in plain.txt -out openssl_cipher.bin
 
+# Расшифруйте с помощью CryptoCore
+cryptocore --algorithm aes --mode cbc --decrypt
+--key 000102030405060708090a0b0c0d0e0f
+--iv AABBCCDDEEFF00112233445566778899
+--input openssl_cipher.bin
+--output decrypted.txt
+
+# Тестирование
+Запустите набор тестов:
 
 python -m pytest tests/
-Or test specific modes:
 
+Или протестируйте определенные режимы:
 
-# Test CBC round-trip
+Тест полного цикла CBC
 python tests/test_modes.py TestNewModes.test_cbc_encrypt_decrypt
 
-# Test interoperability with OpenSSL
+Тест совместимости с OpenSSL
 python tests/test_modes.py TestNewModes.test_interoperability_openssl
-Project Structure
-text
+
+# Структура проекта
+
 cryptocore/
 ├── src/
-│   ├── cli_parser.py      
-│   ├── file_io.py         
-│   ├── modes/             
-│   │   ├── base.py        
-│   │   ├── ecb.py        
-│   │   ├── cbc.py        
-│   │   ├── cfb.py         
-│   │   ├── ofb.py         
-│   │   └── ctr.py        
-│   └── cryptocore.py      
-├── tests/                
-├── requirements.txt       
-├── setup.py               
-└── README.md              
-Notes
-Padding: ECB and CBC modes use PKCS#7 padding. CFB, OFB, and CTR are stream ciphers and do not require padding.
+│ ├── cli_parser.py
+│ ├── file_io.py
+│ ├── modes/
+│ │ ├── base.py
+│ │ ├── ecb.py
+│ │ ├── cbc.py
+│ │ ├── cfb.py
+│ │ ├── ofb.py
+│ │ └── ctr.py
+│ └── cryptocore.py
+├── tests/
+├── requirements.txt
+├── setup.py
+└── README.md
 
-IV Generation: For encryption, a cryptographically secure random IV is generated using os.urandom(16).
+Примечания
+# Дополнение: Режимы ECB и CBC используют PKCS#7 дополнение. CFB, OFB и CTR являются потоковыми шифрами и не требуют дополнения.
 
-Key Format: 16-byte key must be provided as a 32-character hexadecimal string.
+ # Генерация IV: Для шифрования генерируется криптографически стойкий случайный IV с использованием os.urandom(16).
 
-IV Format: 16-byte IV must be provided as a 32-character hexadecimal string when specified.
+# Формат ключа: 16-байтовый ключ должен быть предоставлен в виде 32-символьной шестнадцатеричной строки.
 
+# Формат IV: 16-байтовый IV должен быть предоставлен в виде 32-символьной шестнадцатеричной строки при указании.
 
-## 4. Инструкции по установке и запуску
-
-
-# 1. Активируйте виртуальное окружение
+# 4. Инструкции по установке и запуску
+1. Активируйте виртуальное окружение
 .\venv\Scripts\Activate.ps1
 
 # 2. Установите зависимости
@@ -290,7 +287,7 @@ pip install -e .
 python -m pytest tests/test_modes.py -v
 
 # 5. Пример использования всех режимов
-# Создайте тестовый файл
+Создайте тестовый файл
 echo "Hello, this is a test file for all encryption modes!" > test.txt
 
 # Тестируем каждый режим
@@ -298,679 +295,729 @@ $modes = @("ecb", "cbc", "cfb", "ofb", "ctr")
 $key = "000102030405060708090a0b0c0d0e0f"
 
 foreach ($mode in $modes) {
-    Write-Host "`nTesting $mode mode..." -ForegroundColor Green
-    
-# Шифрование
+Write-Host "`nTesting $mode mode..." -ForegroundColor Green
+
+Шифрование
 cryptocore --algorithm aes --mode $mode --encrypt --key $key --input test.txt --output "test_$mode.enc"
-# Дешифрование
-    if ($mode -eq "ecb") {
-        cryptocore --algorithm aes --mode $mode --decrypt --key $key --input "test_$mode.enc" --output "test_$mode.dec"
-    } else {
-        # Для режимов с IV можно указать IV или читать из файла
-        cryptocore --algorithm aes --mode $mode --decrypt --key $key --input "test_$mode.enc" --output "test_$mode.dec"
-    }
-    
-# Проверка
+
+Расшифровка
+text
+if ($mode -eq "ecb") {
+    cryptocore --algorithm aes --mode $mode --decrypt --key $key --input "test_$mode.enc" --output "test_$mode.dec"
+} else {
+    # Для режимов с IV можно указать IV или читать из файла
+    cryptocore --algorithm aes --mode $mode --decrypt --key $key --input "test_$mode.enc" --output "test_$mode.dec"
+}
+Проверка
 diff test.txt "test_$mode.dec"
-    
-    if ($LASTEXITCODE -eq 0) {
-        Write-Host "  ✓ $mode mode works correctly!" -ForegroundColor Green
-    } else {
-        Write-Host "  ✗ $mode mode failed!" -ForegroundColor Red
-    }
+
+text
+if ($LASTEXITCODE -eq 0) {
+    Write-Host "  ✓ $mode mode works correctly!" -ForegroundColor Green
+} else {
+    Write-Host "  ✗ $mode mode failed!" -ForegroundColor Red
+}
 }
 
-## 4. Обновленный 
+#  4. Обновленный
+CryptoCore - AES-128 Инструмент Шифрования/Расшифровки
+Инструмент командной строки для AES-128 шифрования и расшифровки с безопасной генерацией ключей,
+поддерживающий режимы ECB, CBC, CFB, OFB и CTR.
 
-# CryptoCore - AES-128 Encryption/Decryption Tool
+# Возможности
+Несколько режимов шифрования: ECB, CBC, CFB, OFB, CTR
 
-A command-line tool for AES-128 encryption and decryption with secure key generation,
-supporting ECB, CBC, CFB, OFB, and CTR modes.
+Безопасная генерация ключей: Криптографически стойкая случайная генерация ключей
 
-## Features
+Автоматическая обработка IV: Безопасные случайные IV с правильным форматированием файлов
 
-- **Multiple Encryption Modes:** ECB, CBC, CFB, OFB, CTR
-- **Secure Key Generation:** Cryptographically secure random key generation
-- **Automatic IV Handling:** Secure random IVs with proper file formatting
-- **PKCS#7 Padding:** For modes that require it (ECB, CBC)
-- **Weak Key Detection:** Warns about potentially insecure keys
-- **Interoperability:** Compatible with OpenSSL for verification
+PKCS#7 дополнение: Для режимов, которые этого требуют (ECB, CBC)
 
-## Installation
+Обнаружение слабых ключей: Предупреждает о потенциально небезопасных ключах
 
-### Using pip:
+Совместимость: Совместим с OpenSSL для проверки
 
+# Установка
+Используя pip:
 pip install -e .
-Manual installation:
-bash
+
+ # Ручная установка:
+
 pip install -r requirements.txt
-Quick Start
-Encryption with Automatic Key Generation
-bash
-# Key will be generated and displayed
-cryptocore --algorithm aes --mode cbc --encrypt \
-           --input secret.txt --output secret.enc
-Output will include:
 
+# Быстрый старт
+Шифрование с автоматической генерацией ключа
+
+
+Ключ будет сгенерирован и отображен
+cryptocore --algorithm aes --mode cbc --encrypt
+--input secret.txt --output secret.enc
+
+# Вывод будет включать:
+
+
+[INFO] Сгенерированный ключ: 1a2b3c4d5e6f7890fedcba9876543210
+[INFO] Статистика ключа: 64/128 бит установлены в 1 (50.0%)
+[INFO] Пожалуйста, сохраните этот ключ для расшифровки!
+[INFO] Сгенерированный IV (hex): aabbccddeeff00112233445566778899
+[INFO] IV был записан в начало выходного файла.
+Успешно зашифрован secret.txt -> secret.enc
+
+# Расшифровка с предоставленным ключом
+
+Используйте ключ из шифрования
+cryptocore --algorithm aes --mode cbc --decrypt
+--key 1a2b3c4d5e6f7890fedcba9876543210
+--input secret.enc --output secret_decrypted.txt
+
+# Шифрование с собственным ключом
+
+cryptocore --algorithm aes --mode ctr --encrypt
+--key 000102030405060708090a0b0c0d0e0f
+--input data.txt --output data.enc
+
+Аргументы командной строки
+Аргумент Обязательный Описание
+--algorithm Да Алгоритм шифрования (поддерживается только aes)
+--mode Да Режим работы: ecb, cbc, cfb, ofb, ctr
+--encrypt/--decrypt Да Операция для выполнения (взаимоисключающие)
+--key Для расшифровки 16-байтовый ключ как шестнадцатеричная строка (опционально для шифрования)
+--input Да Путь к входному файлу
+--output Нет Путь к выходному файлу (автогенерируется, если опущен)
+--iv Нет IV как шестнадцатеричная строка (только для расшифровки)
+
+# Управление ключами
+Автоматическая генерация ключей
+Для шифрования: Ключ опционален. Если опущен, генерируется безопасный случайный ключ
+
+Сгенерированные ключи выводятся только в stdout, нигде не сохраняются
+
+# Важно: Вы должны сохранить сгенерированный ключ для расшифровки!
+
+Обнаружение слабых ключей
+Инструмент предупреждает о потенциально слабых ключах:
+
+Все нули (0000...0000)
+
+Все единицы (FFFF...FFFF)
+
+Последовательные байты (00010203...)
+
+# Повторяющиеся шаблоны (AAAA...AAAA, ABAB...ABAB)
+
+# Пример предупреждения:
+
+
+[WARNING] Предоставленный ключ кажется слабым!
+[WARNING] Рекомендуется использовать более случайный ключ для лучшей безопасности.
+
+# Форматы файлов
+Для режимов с IV (CBC, CFB, OFB, CTR):
 text
-[INFO] Generated key: 1a2b3c4d5e6f7890fedcba9876543210
-[INFO] Key statistics: 64/128 bits set to 1 (50.0%)
-[INFO] Please save this key for decryption!
-[INFO] Generated IV (hex): aabbccddeeff00112233445566778899
-[INFO] IV has been written to the beginning of the output file.
-Successfully encrypted secret.txt -> secret.enc
-Decryption with Provided Key
-
-# Use the key from encryption
-cryptocore --algorithm aes --mode cbc --decrypt \
-           --key 1a2b3c4d5e6f7890fedcba9876543210 \
-           --input secret.enc --output secret_decrypted.txt
-Encryption with Your Own Key
-
-cryptocore --algorithm aes --mode ctr --encrypt \
-           --key 000102030405060708090a0b0c0d0e0f \
-           --input data.txt --output data.enc
-Command Line Arguments
-Argument	Required	Description
---algorithm	Yes	Cipher algorithm (only aes supported)
---mode	Yes	Mode of operation: ecb, cbc, cfb, ofb, ctr
---encrypt/--decrypt	Yes	Operation to perform (mutually exclusive)
---key	For decryption	16-byte key as hex string (optional for encryption)
---input	Yes	Input file path
---output	No	Output file path (auto-generated if omitted)
---iv	No	IV as hex string (for decryption only)
-Key Management
-Automatic Key Generation
-For encryption: Key is optional. If omitted, a secure random key is generated
-
-Generated keys are only printed to stdout, not saved anywhere
-
-Important: You must save the generated key for decryption!
-
-Weak Key Detection
-The tool warns about potentially weak keys:
-
-All zeros (0000...0000)
-
-All ones (FFFF...FFFF)
-
-Sequential bytes (00010203...)
-
-Repeated patterns (AAAA...AAAA, ABAB...ABAB)
-
-Example warning:
-
+# Формат зашифрованного файла: [16-байтовый IV][Байты шифртекста]
+Для режима ECB (без IV):
 text
-[WARNING] The provided key appears to be weak!
-[WARNING] Consider using a more random key for better security.
-File Formats
-For modes with IV (CBC, CFB, OFB, CTR):
-text
-Encrypted file format: [16-byte IV][Ciphertext bytes]
-For ECB mode (no IV):
-text
-Encrypted file format: [Ciphertext bytes only]
-Security Properties
-Random Number Generation
-Uses os.urandom() for all cryptographic randomness
+# Формат зашифрованного файла: [Только байты шифртекста]
 
-Cryptographically secure on all major platforms:
+Свойства безопасности
+Генерация случайных чисел
+Использует os.urandom() для всей криптографической случайности
 
-Linux/macOS: Reads from /dev/urandom
+Криптографически стойко на всех основных платформах:
 
-Windows: Uses CryptGenRandom API
+Linux/macOS: Читает из /dev/urandom
 
-Passes NIST statistical randomness tests (see TESTING.md)
+Windows: Использует CryptGenRandom API
 
-Key Security
-Never writes generated keys to disk
+Проходит статистические тесты на случайность NIST (см. TESTING.md)
 
-Keys only transmitted via stdout (visible to user)
+Безопасность ключей
+Никогда не записывает сгенерированные ключи на диск
 
-Users responsible for secure key storage
+Ключи передаются только через stdout (видны пользователю)
 
-Testing
-Basic Tests
+# Пользователи отвечают за безопасное хранение ключей
 
-# Run all tests
+# Тестирование
+Базовые тесты
+
+Запустите все тесты
 python -m pytest tests/ -v
 
-# Test CSPRNG specifically
+Тестируйте CSPRNG отдельно
 python -m pytest tests/test_csprng.py -v
-NIST Statistical Tests
-For rigorous randomness verification, run the NIST Statistical Test Suite:
 
-Generate test data:
+# Статистические тесты NIST
+Для строгой проверки случайности запустите Набор статистических тестов NIST:
 
-python -c "from src.csprng import generate_random_bytes; \
-           open('test_data.bin', 'wb').write(generate_random_bytes(10000000))"
-Run NIST STS (see TESTING.md for detailed instructions)
+Сгенерируйте тестовые данные:
 
-Interoperability with OpenSSL
+python -c "from src.csprng import generate_random_bytes;
+open('test_data.bin', 'wb').write(generate_random_bytes(10000000))"
+Запустите NIST STS (см. TESTING.md для подробных инструкций)
 
-# Encrypt with CryptoCore, decrypt with OpenSSL
+# Совместимость с OpenSSL
+
+Зашифруйте с помощью CryptoCore, расшифруйте с помощью OpenSSL
 cryptocore --algorithm aes --mode cbc --encrypt --input plain.txt --output cipher.bin
 
-# Extract components and decrypt with OpenSSL
+# Извлеките компоненты и расшифруйте с помощью OpenSSL
 dd if=cipher.bin of=iv.bin bs=16 count=1
 dd if=cipher.bin of=cipher_only.bin bs=16 skip=1
 openssl enc -aes-128-cbc -d -K YOUR_KEY -iv $(xxd -p iv.bin) -in cipher_only.bin -out decrypted.txt
-Project Structure
-text
+
+ # Структура проекта
+
 cryptocore/
 ├── src/
-│   ├── csprng.py          
-│   ├── cli_parser.py      
-│   ├── file_io.py         
-│   ├── modes/             
-│   └── cryptocore.py     
-├── tests/                  
-├── requirements.txt       
-├── setup.py              
-├── README.md             
-└── TESTING.md            
-Dependencies
+│ ├── csprng.py
+│ ├── cli_parser.py
+│ ├── file_io.py
+│ ├── modes/
+│ └── cryptocore.py
+├── tests/
+├── requirements.txt
+├── setup.py
+├── README.md
+└── TESTING.md
+
+# Зависимости
 Python 3.6+
 
 pycryptodome
 
-(Optional) nist-sts for statistical testing
+# (Опционально) nist-sts для статистического тестирования
 
-License
-[Specify your license here]
+Лицензия
+[Укажите вашу лицензию здесь]
 
-Security Considerations
-Key Storage: Generated keys are only displayed once. Use a password manager.
+# Вопросы безопасности
+Хранение ключей: Сгенерированные ключи отображаются только один раз. Используйте менеджер паролей.
 
-File Permissions: Protect your key files and encrypted data.
+# Права доступа к файлам: Защитите ваши файлы ключей и зашифрованные данные.
 
-Mode Selection: Avoid ECB for sensitive data; prefer CBC, CTR, or other secure modes.
+# Выбор режима: Избегайте ECB для конфиденциальных данных; предпочитайте CBC, CTR или другие безопасные режимы.
 
-Randomness: The CSPRNG uses OS-provided cryptographic randomness.
+Случайность: CSPRNG использует криптографическую случайность, предоставляемую ОС.
 
-Getting Help
-For issues or questions:
+Получение помощи
+При проблемах или вопросах:
 
-Check the TESTING.md file for troubleshooting
+Проверьте файл TESTING.md для устранения неполадок
 
-Verify OpenSSL interoperability
+Проверьте совместимость с OpenSSL
 
-Ensure you're using the correct key format (32 hex characters)
+Убедитесь, что используете правильный формат ключа (32 шестнадцатеричных символа)
 
-
-
-## 5. Обновленный `requirements.txt`
+ # 5. Обновленный requirements.txt
 pycryptodome==3.20.0
 
-Optional for NIST testing:
+# Опционально для тестирования NIST:
 nist-sts>=0.2.0
 
-
-## 6. Обновленный `setup.py`
-
+# 6. Обновленный setup.py
 from setuptools import setup, find_packages
 
 setup(
-    name="cryptocore",
-    version="3.0.0",
-    packages=find_packages(),
-    install_requires=[
-        'pycryptodome>=3.20.0',
-    ],
-    entry_points={
-        'console_scripts': [
-            'cryptocore=src.cryptocore:main',
-        ],
-    },
-    python_requires='>=3.6',
-    classifiers=[
-        'Development Status :: 4 - Beta',
-        'Intended Audience :: Developers',
-        'Topic :: Security :: Cryptography',
-        'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
-        'Programming Language :: Python :: 3.9',
-        'Programming Language :: Python :: 3.10',
-    ],
+name="cryptocore",
+version="3.0.0",
+packages=find_packages(),
+install_requires=[
+'pycryptodome>=3.20.0',
+],
+entry_points={
+'console_scripts': [
+'cryptocore=src.cryptocore:main',
+],
+},
+python_requires='>=3.6',
+classifiers=[
+'Development Status :: 4 - Beta',
+'Intended Audience :: Developers',
+'Topic :: Security :: Cryptography',
+'License :: OSI Approved :: MIT License',
+'Programming Language :: Python :: 3',
+'Programming Language :: Python :: 3.6',
+'Programming Language :: Python :: 3.7',
+'Programming Language :: Python :: 3.8',
+'Programming Language :: Python :: 3.9',
+'Programming Language :: Python :: 3.10',
+],
 )
-7. Инструкции по запуску
+
+# Инструкции по запуску
 
 # 1. Активируйте виртуальное окружение
-.\.venv\Scripts\Activate.ps1
+..venv\Scripts\Activate.ps1
 
-# 2. Установите обновленные зависимости
+ # 2. Установите обновленные зависимости
 pip install -e .
 
 # 3. Протестируйте новую функциональность
 python -m pytest tests/test_csprng.py -v
 
 # 4. Пример использования с генерацией ключа
-# Создайте тестовый файл
+Создайте тестовый файл
 echo "Sensitive data that needs encryption" > document.txt
 
-# Зашифруйте с автоматической генерацией ключа
+Зашифруйте с автоматической генерацией ключа
 cryptocore --algorithm aes --mode ctr --encrypt --input document.txt --output document.enc
 
-# Скопируйте сгенерированный ключ из вывода и используйте для дешифрования
+Скопируйте сгенерированный ключ из вывода и используйте для расшифровки
 cryptocore --algorithm aes --mode ctr --decrypt --key СКОПИРУЙТЕ_КЛЮЧ_ЗДЕСЬ --input document.enc --output document_decrypted.txt
 
-# Проверьте, что файлы идентичны
+Проверьте, что файлы идентичны
 diff document.txt document_decrypted.txt
-## 8. Генерация тестовых данных для NIST
+
+# 8. Генерация тестовых данных для NIST
 Для выполнения требований NIST тестирования:
 
 python
-# Создайте файл generate_nist_data.py
+
+Создайте файл generate_nist_data.py
 from src.csprng import generate_random_bytes
 
-# Генерация 100MB тестовых данных
+Генерация 100MB тестовых данных
 size_mb = 100
 size_bytes = size_mb * 1024 * 1024
 
 print(f"Generating {size_mb}MB of random data for NIST testing...")
 
 with open('nist_random_data.bin', 'wb') as f:
-    chunk_size = 65536  # 64KB chunks
-    written = 0
+chunk_size = 65536 # 64KB chunks
+written = 0
+
+
+while written < size_bytes:
+    chunk = generate_random_bytes(min(chunk_size, size_bytes - written))
+    f.write(chunk)
+    written += len(chunk)
     
-    while written < size_bytes:
-        chunk = generate_random_bytes(min(chunk_size, size_bytes - written))
-        f.write(chunk)
-        written += len(chunk)
-        
-        # Progress indicator
-        if written % (10 * 1024 * 1024) == 0:  # Every 10MB
-            print(f"  {written / (1024*1024):.1f}MB / {size_mb}MB")
-
+    # Progress indicator
+    if written % (10 * 1024 * 1024) == 0:  # Every 10MB
+        print(f"  {written / (1024*1024):.1f}MB / {size_mb}MB")
 print(f"Done! Generated {written} bytes in 'nist_random_data.bin'")
-# CryptoCore - Cryptographic Tool
 
-A comprehensive command-line cryptographic tool with:
-- AES-128 encryption/decryption (ECB, CBC, CFB, OFB, CTR modes)
-- Secure key generation using CSPRNG
-- Hash functions (SHA-256, SHA3-256) implemented from scratch
-- File integrity verification
+CryptoCore - Криптографический инструмент
+Комплексный инструмент командной строки для криптографии с:
 
-## Features
+AES-128 шифрованием/расшифровкой (режимы ECB, CBC, CFB, OFB, CTR)
 
-### Encryption/Decryption
-- **Algorithms:** AES-128
-- **Modes:** ECB, CBC, CFB, OFB, CTR
-- **Key Management:** Automatic secure key generation
-- **IV Handling:** Secure random IVs with proper file formatting
-- **Padding:** PKCS#7 for ECB and CBC modes
+Безопасной генерацией ключей с использованием CSPRNG
 
-### Hash Functions
-- **SHA-256:** Implemented from scratch following NIST FIPS 180-4
-- **SHA3-256:** Implemented from scratch using Keccak sponge construction
-- **Streaming:** Processes files in chunks for constant memory usage
-- **Interoperable:** Compatible with standard tools (sha256sum, sha3sum)
+Хэш-функциями (SHA-256, SHA3-256), реализованными с нуля
 
-## Installation
+# Проверкой целостности файлов
 
+Возможности
+Шифрование/Расшифровка
+Алгоритмы: AES-128
 
-# Install from source
+Режимы: ECB, CBC, CFB, OFB, CTR
+
+Управление ключами: Автоматическая безопасная генерация ключей
+
+# Обработка IV: Безопасные случайные IV с правильным форматированием файлов
+
+Дополнение: PKCS#7 для режимов ECB и CBC
+
+Хэш-функции
+SHA-256: Реализована с нуля в соответствии с NIST FIPS 180-4
+
+SHA3-256: Реализована с нуля с использованием губчатой конструкции Keccak
+
+Потоковая обработка: Обрабатывает файлы частями для постоянного использования памяти
+
+Совместимость: Совместима со стандартными инструментами (sha256sum, sha3sum)
+
+# Установка
+Установите из исходного кода
 pip install -e .
 
-# Or manually
+# Или вручную
 pip install -r requirements.txt
-Quick Start
-Encryption
 
-# Encrypt with auto-generated key
+Быстрый старт
+Шифрование
+
+# Зашифруйте с автогенерированным ключом
 cryptocore --algorithm aes --mode cbc --encrypt --input secret.txt --output secret.enc
 
-# Encrypt with provided key
+Зашифруйте с предоставленным ключом
 cryptocore --algorithm aes --mode ctr --encrypt --key 000102030405060708090a0b0c0d0e0f --input data.txt --output data.enc
-Decryption
 
-# Decrypt with key
+Расшифровка
+
+Расшифруйте с ключом
 cryptocore --algorithm aes --mode cbc --decrypt --key YOUR_KEY --input secret.enc --output secret.txt
-Hash Computation
 
-# Compute SHA-256 hash
+# Вычисление хэша
+
+Вычислите хэш SHA-256
 cryptocore dgst --algorithm sha256 --input file.txt
 
-# Compute SHA3-256 hash and save to file
+Вычислите хэш SHA3-256 и сохраните в файл
 cryptocore dgst --algorithm sha3-256 --input large_file.iso --output hash.txt
 
-# Hash from stdin
+Хэш из stdin
 cat file.txt | cryptocore dgst --algorithm sha256 --input -
-Command Reference
-Encryption/Decryption (Default Mode)
-bash
+
+# Справочник команд
+Шифрование/Расшифровка (Режим по умолчанию)
+
 cryptocore [--algorithm aes] --mode MODE (--encrypt|--decrypt) [--key HEX_KEY] --input FILE [--output FILE] [--iv HEX_IV]
-Hash Computation Mode
-bash
+
+# Режим вычисления хэша
+
 cryptocore dgst --algorithm (sha256|sha3-256) --input FILE [--output FILE]
-Hash Algorithms
+
+Хэш-алгоритмы
 SHA-256
-Standard: NIST FIPS 180-4
+Стандарт: NIST FIPS 180-4
 
-Output: 256 bits (32 bytes, 64 hex characters)
+Вывод: 256 бит (32 байта, 64 шестнадцатеричных символа)
 
-Implementation: From scratch using Merkle-Damgård construction
+Реализация: С нуля с использованием конструкции Merkle-Damgård
 
-Tested against: NIST test vectors
+Протестировано: Тестовые векторы NIST
 
 SHA3-256
-Standard: NIST FIPS 202 (Keccak)
+Стандарт: NIST FIPS 202 (Keccak)
 
-Output: 256 bits (32 bytes, 64 hex characters)
+Вывод: 256 бит (32 байта, 64 шестнадцатеричных символа)
 
-Implementation: From scratch using sponge construction
+Реализация: С нуля с использованием губчатой конструкции
 
-Tested against: Known test vectors
+Протестировано: Известные тестовые векторы
 
-Examples
-File Integrity Verification
+Примеры
+Проверка целостности файлов
 
-# Create hash of original file
+Создайте хэш исходного файла
 cryptocore dgst --algorithm sha256 --input original.iso --output original.sha256
 
-# Later, verify the file hasn't changed
+Позже, проверьте, что файл не изменился
 cryptocore dgst --algorithm sha256 --input downloaded.iso | diff - original.sha256
-Combined Encryption and Integrity Check
 
-# Create hash of plaintext
+Комбинированное шифрование и проверка целостности
+
+Создайте хэш открытого текста
 cryptocore dgst --algorithm sha256 --input document.txt --output document.hash
 
-# Encrypt the file
+Зашифруйте файл
 cryptocore --algorithm aes --mode cbc --encrypt --input document.txt --output document.enc
 
-# Decrypt and verify integrity
+Расшифруйте и проверьте целостность
 cryptocore --algorithm aes --mode cbc --decrypt --key YOUR_KEY --input document.enc --output document.dec
 cryptocore dgst --algorithm sha256 --input document.dec | diff - document.hash
-Testing
-Run All Tests
+
+# Тестирование
+Запустите все тесты
 
 python -m pytest tests/ -v
-Specific Test Suites
 
-# Test hash functions
+# Конкретные наборы тестов
+
+# Тестируйте хэш-функции
 python -m pytest tests/test_hash.py -v
 
-# Test encryption
+Тестируйте шифрование
 python -m pytest tests/test_modes.py -v
 
-# Test CSPRNG
+# Тестируйте CSPRNG
 python -m pytest tests/test_csprng.py -v
-NIST Test Vectors
-The implementations pass all NIST test vectors:
 
-SHA-256: Tests from FIPS 180-4
+Тестовые векторы NIST
+Реализации проходят все тестовые векторы NIST:
 
-SHA3-256: Tests from FIPS 202
+# SHA-256: Тесты из FIPS 180-4
 
-Interoperability Testing
-bash
-# Compare with system tools
+# SHA3-256: Тесты из FIPS 202
+
+Тестирование совместимости
+
+
+Сравните с системными инструментами
 cryptocore dgst --algorithm sha256 --input test.txt > our_hash.txt
 sha256sum test.txt > system_hash.txt
 diff our_hash.txt system_hash.txt
-Implementation Details
-SHA-256 Implementation
-Padding: SHA-256 padding (append '1', zeros, 64-bit length)
 
-Block processing: 512-bit blocks
+# Детали реализации
+Реализация SHA-256
+Дополнение: Дополнение SHA-256 (добавить '1', нули, 64-битная длина)
 
-Compression function: 64 rounds with round constants
+Обработка блоков: 512-битные блоки
 
-Word expansion: Message schedule expansion
+# Функция сжатия: 64 раунда с константами раундов
 
-Operations: Bitwise rotations, XOR, AND, NOT, addition mod 2³²
+Расширение слов: Расширение расписания сообщений
 
-SHA3-256 Implementation
-Sponge construction: Rate 1088 bits, capacity 512 bits
+Операции: Побитовые вращения, XOR, AND, NOT, сложение по модулю 2³²
 
-Keccak-f[1600] permutation: 24 rounds
+# Реализация SHA3-256
+Губчатая конструкция: Скорость 1088 бит, емкость 512 бит
 
-State: 5×5 array of 64-bit words
+Перестановка Keccak-f[1600]: 24 раунда
 
-Operations: θ, ρ, π, χ, ι steps
+Состояние: Массив 5×5 из 64-битных слов
 
-Performance
-The implementations are optimized for clarity and correctness rather than speed. For large files:
+# Операции: Шаги θ, ρ, π, χ, ι
 
-Processes data in 8KB chunks
+Производительность
+Реализации оптимизированы для ясности и корректности, а не для скорости. Для больших файлов:
 
-Constant memory usage regardless of file size
+# Обрабатывает данные частями по 8KB
 
-Compatible with streaming applications
+Постоянное использование памяти независимо от размера файла
 
-Security Considerations
-Hash Functions
-SHA-256: Widely used, considered secure
+Совместимо с потоковыми приложениями
 
-SHA3-256: Next-generation hash, resistant to length extension attacks
+# Вопросы безопасности
+Хэш-функции
+# SHA-256: Широко используется, считается безопасной
 
-Both: Implemented from specification, not optimized versions
+# SHA3-256: Хэш-функция следующего поколения, устойчива к атакам на расширение длины
 
-Randomness
-Key generation uses os.urandom()
+Обе: Реализованы в соответствии со спецификацией, не оптимизированные версии
 
-IV generation uses cryptographically secure RNG
+# Случайность
+Генерация ключей использует os.urandom()
 
-Weak key detection warns about insecure patterns
+#  Генерация IV использует криптографически стойкий ГСЧ
 
-Project Structure
-text
+Обнаружение слабых ключей предупреждает о небезопасных шаблонах
+
+# Структура проекта
+
 cryptocore/
 ├── src/
-│   ├── hash/           
-│   │   ├── sha256.py   
-│   │   ├── sha3_256.py 
-│   │   └── utils.py    
-│   ├── modes/          
-│   ├── csprng.py       
-│   ├── cli_parser.py   
-│   └── cryptocore.py   
-├── tests/              
-├── requirements.txt    
-└── README.md          
-Dependencies
+│ ├── hash/
+│ │ ├── sha256.py
+│ │ ├── sha3_256.py
+│ │ └── utils.py
+│ ├── modes/
+│ ├── csprng.py
+│ ├── cli_parser.py
+│ └── cryptocore.py
+├── tests/
+├── requirements.txt
+└── README.md
+
+# Зависимости
 Python 3.6+
 
-pycryptodome (for AES encryption)
+# pycryptodome (для AES шифрования)
 
-License
-[Specify your license here]
+# Лицензия
+[Укажите вашу лицензию здесь]
 
-Acknowledgments
-NIST for cryptographic standards
+# Благодарности
+NIST за криптографические стандарты
 
-Cryptography community for test vectors
+Криптографическому сообществу за тестовые векторы
 
-Course instructors for project guidance
+# Преподавателям курса за руководство по проекту
 
-
-
-
-
-
-# Hash function tests
+Тесты хэш-функций
 python -m pytest tests/test_hash.py::TestSHA256 -v
 python -m pytest tests/test_hash.py::TestSHA3_256 -v
 python -m pytest tests/test_hash.py::TestNISTVectors -v
 
-# CLI tests
+# Тесты CLI
 python -m pytest tests/test_hash.py::TestCLIHash -v
-Performance Testing
 
-# Time hash computation
+# Тестирование производительности
+
+# Измерьте время вычисления хэша
 time cryptocore dgst --algorithm sha256 --input large_file.iso
 
-# Compare with system tools
+# Сравните с системными инструментами
 time sha256sum large_file.iso
 
-## 5. Тестовые векторы (опционально)
-
-Создайте файл `tests/test_vectors/sha256.json`:
+# 5. Тестовые векторы (опционально)
+Создайте файл tests/test_vectors/sha256.json:
 
 {
-    "test_vectors": [
-        {
-            "message": "",
-            "hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-        },
-        {
-            "message": "abc",
-            "hash": "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
-        },
-        {
-            "message": "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq",
-            "hash": "248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1"
-        }
-    ]
+"test_vectors": [
+{
+"message": "",
+"hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+},
+{
+"message": "abc",
+"hash": "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+},
+{
+"message": "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq",
+"hash": "248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1"
 }
+]
+}
+
 ##6. Инструкции по запуску
 
-# Установка и тестирование
+Установка и тестирование
 .\venv\Scripts\Activate.ps1
 pip install -e .
 python -m pytest tests/test_hash.py -v
 
-# Примеры использования
+Примеры использования
 echo "Test data" > test.txt
 
-# Хеширование
+Хэширование
 cryptocore dgst --algorithm sha256 --input test.txt
 cryptocore dgst --algorithm sha3-256 --input test.txt --output hash.txt
 
-# Проверка с системными утилитами (если доступны)
+Проверка с системными утилитами (если доступны)
 cryptocore dgst --algorithm sha256 --input test.txt > our_hash.txt
-# На Linux: sha256sum test.txt > system_hash.txt
-# diff our_hash.txt system_hash.txt
 
-# CryptoCore - Cryptographic Tool
+На Linux: sha256sum test.txt > system_hash.txt
+diff our_hash.txt system_hash.txt
+CryptoCore - Криптографический инструмент
+Комплексный инструмент командной строки для криптографии с:
 
-A comprehensive command-line cryptographic tool with:
-- AES-128 encryption/decryption (ECB, CBC, CFB, OFB, CTR modes)
-- Secure key generation using CSPRNG
-- Hash functions (SHA-256, SHA3-256) implemented from scratch
-- HMAC (Hash-based Message Authentication Code) for data authenticity
-- AES-CMAC (optional bonus feature)
+AES-128 шифрованием/расшифровкой (режимы ECB, CBC, CFB, OFB, CTR)
 
-## Features
+Безопасной генерацией ключей с использованием CSPRNG
 
-### Encryption/Decryption
-- **Algorithms:** AES-128
-- **Modes:** ECB, CBC, CFB, OFB, CTR
-- **Key Management:** Automatic secure key generation
-- **IV Handling:** Secure random IVs with proper file formatting
+Хэш-функциями (SHA-256, SHA3-256), реализованными с нуля
 
-### Hash Functions
-- **SHA-256:** Implemented from scratch following NIST FIPS 180-4
-- **SHA3-256:** Implemented from scratch using Keccak sponge construction
+HMAC (код аутентификации сообщений на основе хэша) для проверки подлинности данных
 
-### Message Authentication Codes (MAC)
-- **HMAC-SHA256:** Implemented from scratch following RFC 2104
-- **AES-CMAC:** Optional implementation following NIST SP 800-38B
-- **Key Support:** Arbitrary length keys for HMAC, 16-byte keys for AES-CMAC
-- **Verification:** Built-in verification with detailed error messages
-- **Streaming:** Processes large files in chunks for constant memory usage
+AES-CMAC (опциональная дополнительная функция)
 
-## Installation
+Возможности
+Шифрование/Расшифровка
+Алгоритмы: AES-128
 
+Режимы: ECB, CBC, CFB, OFB, CTR
 
-# Install from source
+Управление ключами: Автоматическая безопасная генерация ключей
+
+Обработка IV: Безопасные случайные IV с правильным форматированием файлов
+
+Хэш-функции
+SHA-256: Реализована с нуля в соответствии с NIST FIPS 180-4
+
+SHA3-256: Реализована с нуля с использованием губчатой конструкции Keccak
+
+Коды аутентификации сообщений (MAC)
+HMAC-SHA256: Реализован с нуля в соответствии с RFC 2104
+
+AES-CMAC: Опциональная реализация в соответствии с NIST SP 800-38B
+
+Поддержка ключей: Ключи произвольной длины для HMAC, 16-байтовые ключи для AES-CMAC
+
+Проверка: Встроенная проверка с подробными сообщениями об ошибках
+
+Потоковая обработка: Обрабатывает большие файлы частями для постоянного использования памяти
+
+# Установка
+Установите из исходного кода
 pip install -e .
 
-# Or manually
+Или вручную
 pip install -r requirements.txt
-Quick Start
-Encryption
 
-# Encrypt with auto-generated key
+# Быстрый старт
+# Шифрование
+
+Зашифруйте с автогенерированным ключом
 cryptocore --algorithm aes --mode cbc --encrypt --input secret.txt --output secret.enc
-Hash Computation
 
-# Compute SHA-256 hash
+Вычисление хэша
+
+Вычислите хэш SHA-256
 cryptocore dgst --algorithm sha256 --input file.txt
 
-# Compute SHA3-256 hash
+Вычислите хэш SHA3-256
 cryptocore dgst --algorithm sha3-256 --input file.txt --output hash.txt
-HMAC Generation and Verification
 
-# Generate HMAC
+Генерация и проверка HMAC
+
+Сгенерируйте HMAC
 cryptocore dgst --algorithm sha256 --hmac --key YOUR_KEY_HEX --input message.txt
 
-# Verify HMAC
+Проверьте HMAC
 cryptocore dgst --algorithm sha256 --hmac --key YOUR_KEY_HEX --input message.txt --verify expected_hmac.txt
 
-# Generate and save HMAC
+Сгенерируйте и сохраните HMAC
 cryptocore dgst --algorithm sha256 --hmac --key YOUR_KEY_HEX --input message.txt --output message.hmac
-HMAC Command Reference
-Basic HMAC Generation
+
+Справочник команд HMAC
+Базовая генерация HMAC
 
 cryptocore dgst --algorithm sha256 --hmac --key <hex_key> --input <file>
-HMAC with Output File
+
+HMAC с выходным файлом
 
 cryptocore dgst --algorithm sha256 --hmac --key <hex_key> --input <file> --output <hmac_file>
-HMAC Verification
+
+Проверка HMAC
 
 cryptocore dgst --algorithm sha256 --hmac --key <hex_key> --input <file> --verify <hmac_file>
-AES-CMAC (Bonus Feature)
+
+AES-CMAC (Дополнительная функция)
 
 cryptocore dgst --algorithm sha256 --cmac --key <16_byte_hex_key> --input <file>
-Key Formats
-For HMAC:
-Format: Hexadecimal string
 
-Length: Arbitrary (any length supported)
+Форматы ключей
+Для HMAC:
+Формат: Шестнадцатеричная строка
 
-Example: 00112233445566778899aabbccddeeff
+Длина: Произвольная (поддерживается любая длина)
 
-For AES-CMAC:
-Format: Hexadecimal string
+Пример: 00112233445566778899aabbccddeeff
 
-Length: 32 characters (16 bytes)
+Для AES-CMAC:
+Формат: Шестнадцатеричная строка
 
-Example: 2b7e151628aed2a6abf7158809cf4f3c
+Длина: 32 символа (16 байт)
 
-HMAC Security Properties
-Based on RFC 2104:
-Key Processing: Keys longer than block size are hashed, shorter keys are zero-padded
+Пример: 2b7e151628aed2a6abf7158809cf4f3c
 
-Construction: HMAC(K, m) = H((K ⊕ opad) || H((K ⊕ ipad) || m))
+Свойства безопасности HMAC
+На основе RFC 2104:
+Обработка ключей: Ключи длиннее размера блока хэшируются, более короткие ключи дополняются нулями
 
-Security: Proven to be secure if the underlying hash function is secure
+Конструкция: HMAC(K, m) = H((K ⊕ opad) || H((K ⊕ ipad) || m))
 
-Resistance: Resistant to length extension attacks
+Безопасность: Доказана безопасность, если базовая хэш-функция безопасна
 
-Verification Features:
-Constant-time comparison: Prevents timing attacks
+Устойчивость: Устойчив к атакам на расширение длины
 
-Detailed error messages: Helps diagnose verification failures
+Особенности проверки:
+Сравнение за постоянное время: Предотвращает атаки по времени
 
-Flexible input parsing: Accepts various HMAC file formats
+Подробные сообщения об ошибках: Помогает диагностировать сбои проверки
 
-Examples
-File Integrity and Authenticity
+Гибкий разбор ввода: Принимает различные форматы файлов HMAC
 
-# Create HMAC of important document
+Примеры
+Целостность и подлинность файлов
+
+Создайте HMAC важного документа
 cryptocore dgst --algorithm sha256 --hmac --key $(cat secret.key) --input document.pdf --output document.pdf.hmac
 
-# Later, verify the document hasn't been tampered with
+Позже, проверьте, что документ не был изменен
 cryptocore dgst --algorithm sha256 --hmac --key $(cat secret.key) --input document.pdf --verify document.pdf.hmac
-Combined Encryption and Authentication
 
-# Generate random key for encryption
+Комбинированное шифрование и аутентификация
+
+Сгенерируйте случайный ключ для шифрования
 cryptocore --algorithm aes --mode cbc --encrypt --input data.txt --output data.enc
-# Save the displayed key!
 
-# Create HMAC of ciphertext for integrity
+Сохраните отображенный ключ!
+Создайте HMAC шифртекста для целостности
 cryptocore dgst --algorithm sha256 --hmac --key $(cat hmac.key) --input data.enc --output data.enc.hmac
 
-# Verify before decryption
+Проверьте перед расшифровкой
 cryptocore dgst --algorithm sha256 --hmac --key $(cat hmac.key) --input data.enc --verify data.enc.hmac
 cryptocore --algorithm aes --mode cbc --decrypt --key ENCRYPTION_KEY --input data.enc --output data.dec
-Testing HMAC Implementation
 
-# Test with RFC 4231 test vectors
+Тестирование реализации HMAC
+
+Тестируйте с тестовыми векторами RFC 4231
 python -c "
 from src.mac import HMAC
 key = bytes([0x0b] * 20)
@@ -979,732 +1026,788 @@ hmac = HMAC(key, 'sha256')
 print('HMAC:', hmac.compute_hex(message))
 print('Expected: b0344c61d8db38535ca8afceaf0bf12b881dc200c9833da726e9376c2e32cff7')
 "
-Testing
-Run All Tests
+
+Тестирование
+Запустите все тесты
 
 python -m pytest tests/ -v
-Specific Test Suites
 
-# Test HMAC functionality
+Конкретные наборы тестов
+
+Тестируйте функциональность HMAC
 python -m pytest tests/test_hmac.py -v
 
-# Test RFC 4231 test vectors
+Тестируйте тестовые векторы RFC 4231
 python -m pytest tests/test_hmac.py::TestHMAC::test_rfc_4231_test_case_1 -v
 
-# Test CLI HMAC commands
+Тестируйте CLI команды HMAC
 python -m pytest tests/test_hmac.py::TestCLIHMAC -v
-Test Coverage
-✓ RFC 4231 test vectors 1-4
 
-✓ Various key sizes (short, exact, long)
+Покрытие тестами
+✓ Тестовые векторы RFC 4231 1-4
 
-✓ Empty message handling
+✓ Различные размеры ключей (короткие, точные, длинные)
 
-✓ Tamper detection
+✓ Обработка пустых сообщений
 
-✓ Wrong key detection
+✓ Обнаружение изменений
 
-✓ Streaming large files
+✓ Обнаружение неправильного ключа
 
-✓ CLI interface correctness
+✓ Потоковая обработка больших файлов
 
-✓ Verification functionality
+✓ Корректность CLI интерфейса
 
-Implementation Details
-HMAC Implementation
-Specification: RFC 2104 compliant
+✓ Функциональность проверки
 
-Hash Function: Uses SHA-256 implementation from Sprint 4
+Детали реализации
+Реализация HMAC
+Спецификация: Соответствует RFC 2104
 
-Block Size: 64 bytes for SHA-256
+Хэш-функция: Использует реализацию SHA-256 из Sprint 4
 
-Key Processing: Automatically handles keys of any length
+Размер блока: 64 байта для SHA-256
 
-Streaming: Supports processing large files in chunks
+Обработка ключей: Автоматически обрабатывает ключи любой длины
 
-Constant-time: Uses constant-time comparison for verification
+Потоковая обработка: Поддерживает обработку больших файлов частями
 
-File Processing
-Chunk Size: 8KB chunks for efficient memory usage
+Постоянное время: Использует сравнение за постоянное время для проверки
 
-Binary Mode: All files read/written in binary mode
+Обработка файлов
+Размер части: Части по 8KB для эффективного использования памяти
 
-Large Files: Can process files larger than available memory
+Бинарный режим: Все файлы читаются/записываются в бинарном режиме
 
-Streaming: Computes HMAC without loading entire file into memory
+Большие файлы: Может обрабатывать файлы больше доступной памяти
 
-Security Considerations
-Key Security
-HMAC keys should be kept secret
+Потоковая обработка: Вычисляет HMAC без загрузки всего файла в память
 
-Use cryptographically secure random keys
+Вопросы безопасности
+Безопасность ключей
+Ключи HMAC должны храниться в секрете
 
-Store keys securely (password manager, hardware security module)
+Используйте криптографически стойкие случайные ключи
 
-Verification Security
-Uses constant-time comparison to prevent timing attacks
+Храните ключи безопасно (менеджер паролей, аппаратный модуль безопасности)
 
-Detailed error messages don't reveal sensitive information
+Безопасность проверки
+Использует сравнение за постоянное время для предотвращения атак по времени
 
-Verification fails safely on any mismatch
+Подробные сообщения об ошибках не раскрывают конфиденциальную информацию
 
-Algorithm Security
-HMAC-SHA256 is widely considered secure
+Проверка безопасно завершается с ошибкой при любом несоответствии
 
-AES-CMAC provides similar security guarantees
+Безопасность алгоритмов
+HMAC-SHA256 широко считается безопасным
 
-Both are standardized and well-vetted algorithms
+AES-CMAC предоставляет аналогичные гарантии безопасности
 
-Project Structure
+Оба являются стандартизированными и хорошо проверенными алгоритмами
+
+Структура проекта
 
 cryptocore/
 ├── src/
-│   ├── mac/              
-│   │   ├── hmac.py       
-│   │   ├── cmac.py       
-│   │   └── utils.py    
-│   ├── hash/             
-│   ├── modes/            
-│   ├── csprng.py         
-│   └── cryptocore.py     
-├── tests/                
-├── requirements.txt      
-└── README.md            
+│ ├── mac/
+│ │ ├── hmac.py
+│ │ ├── cmac.py
+│ │ └── utils.py
+│ ├── hash/
+│ ├── modes/
+│ ├── csprng.py
+│ └── cryptocore.py
+├── tests/
+├── requirements.txt
+└── README.md
 
-# CryptoCore - Advanced Cryptographic Tool
+CryptoCore - Продвинутый криптографический инструмент
+Комплексный инструмент командной строки для криптографии с поддержкой аутентифицированного шифрования.
 
-A comprehensive command-line cryptographic tool with **authenticated encryption** support.
+🚀 Возможности
+🔐 Шифрование/Расшифровка
+Стандартные режимы: ECB, CBC, CFB, OFB, CTR
 
-## 🚀 Features
+Аутентифицированные режимы: GCM (Galois/Counter Mode), Encrypt-then-MAC
 
-### 🔐 Encryption/Decryption
-- **Standard Modes:** ECB, CBC, CFB, OFB, CTR
-- **Authenticated Modes:** GCM (Galois/Counter Mode), Encrypt-then-MAC
-- **Key Management:** Secure random key generation
-- **IV/Nonce Handling:** Automatic generation with proper formatting
+Управление ключами: Безопасная случайная генерация ключей
 
-### 🔒 Authenticated Encryption (AEAD)
-- **GCM:** NIST SP 800-38D compliant, 12-byte nonce, 16-byte tag
-- **Encrypt-then-MAC:** Combine any cipher mode with HMAC-SHA256
-- **Associated Data:** Support for arbitrary-length AAD
-- **Catastrophic Failure:** No output on authentication failure
+Обработка IV/Nonce: Автоматическая генерация с правильным форматированием
 
-### 📊 Hash Functions
-- **SHA-256:** FIPS 180-4 implementation
-- **SHA3-256:** Keccak sponge construction
-- **HMAC-SHA256:** RFC 2104 compliant
-- **AES-CMAC:** NIST SP 800-38B (bonus)
+🔒 Аутентифицированное шифрование (AEAD)
+GCM: Соответствует NIST SP 800-38D, 12-байтовый nonce, 16-байтовый тег
 
-## 📦 Installation
+Encrypt-then-MAC: Комбинирование любого режима шифра с HMAC-SHA256
 
-# Clone repository
+Ассоциированные данные: Поддержка AAD произвольной длины
+
+Катастрофический отказ: Нет вывода при неудачной аутентификации
+
+📊 Хэш-функции
+SHA-256: Реализация FIPS 180-4
+
+SHA3-256: Губчатая конструкция Keccak
+
+HMAC-SHA256: Соответствует RFC 2104
+
+AES-CMAC: NIST SP 800-38B (дополнительно)
+
+📦 Установка
+Клонируйте репозиторий
 git clone https://github.com/yourusername/cryptocore.git
 cd cryptocore
 
-# Install dependencies
+Установите зависимости
 pip install -r requirements.txt
 
-# Install in development mode
+Установите в режиме разработки
 pip install -e .
- Quick Start
-GCM Encryption
 
-# Encrypt with auto-generated key
-cryptocore --algorithm aes --mode gcm --encrypt \
-           --input secret.txt \
-           --output secret.gcm \
-           --aad aabbccddeeff
+Быстрый старт
+Шифрование GCM
 
-# Output includes generated key and nonce
-GCM Decryption
+Зашифруйте с автогенерированным ключом
+cryptocore --algorithm aes --mode gcm --encrypt
+--input secret.txt
+--output secret.gcm
+--aad aabbccddeeff
 
-# Decrypt with saved key
-cryptocore --algorithm aes --mode gcm --decrypt \
-           --key YOUR_KEY_HERE \
-           --input secret.gcm \
-           --output secret_decrypted.txt \
-           --aad aabbccddeeff
+Вывод включает сгенерированный ключ и nonce
+Расшифровка GCM
+
+Расшифруйте с сохраненным ключом
+cryptocore --algorithm aes --mode gcm --decrypt
+--key YOUR_KEY_HERE
+--input secret.gcm
+--output secret_decrypted.txt
+--aad aabbccddeeff
+
 Encrypt-then-MAC
 
-# Encrypt with integrity protection
-cryptocore --algorithm aes --mode etm --encrypt \
-           --key 32_BYTE_KEY_HEX \
-           --input data.txt \
-           --output data.etm \
-           --aad metadata123
+Зашифруйте с защитой целостности
+cryptocore --algorithm aes --mode etm --encrypt
+--key 32_BYTE_KEY_HEX
+--input data.txt
+--output data.etm
+--aad metadata123
 
-# Decrypt with verification
-cryptocore --algorithm aes --mode etm --decrypt \
-           --key 32_BYTE_KEY_HEX \
-           --input data.etm \
-           --output data_decrypted.txt \
-           --aad metadata123
- Complete Usage
-GCM Mode
+Расшифруйте с проверкой
+cryptocore --algorithm aes --mode etm --decrypt
+--key 32_BYTE_KEY_HEX
+--input data.etm
+--output data_decrypted.txt
+--aad metadata123
 
-# Encryption with specific nonce
-cryptocore --algorithm aes --mode gcm --encrypt \
-           --key 00112233445566778899aabbccddeeff \
-           --iv 000000000000000000000000 \
-           --input plain.txt \
-           --output cipher.gcm \
-           --aad associated_data_hex
+Полное использование
+Режим GCM
 
-# Decryption (reads nonce from file)
-cryptocore --algorithm aes --mode gcm --decrypt \
-           --key 00112233445566778899aabbccddeeff \
-           --input cipher.gcm \
-           --output plain.txt \
-           --aad associated_data_hex
-Encrypt-then-MAC Mode
+Шифрование с указанием nonce
+cryptocore --algorithm aes --mode gcm --encrypt
+--key 00112233445566778899aabbccddeeff
+--iv 000000000000000000000000
+--input plain.txt
+--output cipher.gcm
+--aad associated_data_hex
+
+Расшифровка (читает nonce из файла)
+cryptocore --algorithm aes --mode gcm --decrypt
+--key 00112233445566778899aabbccddeeff
+--input cipher.gcm
+--output plain.txt
+--aad associated_data_hex
+
+Режим Encrypt-then-MAC
 bash
-# Using CBC as base mode
-cryptocore --algorithm aes --mode etm --encrypt \
-           --key 64_HEX_CHARS_32_BYTES \
-           --input file.txt \
-           --output file.etm
 
-# With explicit IV
-cryptocore --algorithm aes --mode etm --decrypt \
-           --key 64_HEX_CHARS_32_BYTES \
-           --iv IV_HEX_32_CHARS \
-           --input file.etm \
-           --output file.txt
- File Formats
-GCM Format
+Использование CBC как базового режима
+cryptocore --algorithm aes --mode etm --encrypt
+--key 64_HEX_CHARS_32_BYTES
+--input file.txt
+--output file.etm
+
+С явным IV
+cryptocore --algorithm aes --mode etm --decrypt
+--key 64_HEX_CHARS_32_BYTES
+--iv IV_HEX_32_CHARS
+--input file.etm
+--output file.txt
+
+Форматы файлов
+Формат GCM
 text
-[12-byte nonce][ciphertext][16-byte authentication tag]
-Encrypt-then-MAC Format
+[12-байтовый nonce][шифртекст][16-байтовый тег аутентификации]
+
+Формат Encrypt-then-MAC
 text
-[16-byte IV (optional)][ciphertext][32-byte HMAC tag]
- Testing
+[16-байтовый IV (опционально)][шифртекст][32-байтовый тег HMAC]
+
+Тестирование
 bash
-# Run all tests
+
+Запустите все тесты
 python -m pytest tests/ -v
 
-# Test GCM specifically
+Тестируйте GCM отдельно
 python -m pytest tests/test_gcm.py -v
 
-# Test Encrypt-then-MAC
+Тестируйте Encrypt-then-MAC
 python -m pytest tests/test_encrypt_then_mac.py -v
 
-# Test security properties
+Тестируйте свойства безопасности
 python -m pytest tests/test_gcm.py::TestGCM::test_ciphertext_tamper -v
- Security Features
-## Authentication Failure Handling
-No partial output: Files not created on authentication failure
 
-Clean exit: Non-zero exit codes with descriptive errors
+Функции безопасности
 
-Timing attack protection: Constant-time comparisons
+Обработка неудачной аутентификации
+Нет частичного вывода: Файлы не создаются при неудачной аутентификации
 
-Key Security
-Weak key detection: Warns about predictable keys
+Чистый выход: Ненулевые коды выхода с описательными ошибками
 
-Secure generation: Cryptographically random keys via OS RNG
+Защита от атак по времени: Сравнения за постоянное время
 
-Key separation: Different keys for encryption and MAC
+Безопасность ключей
+Обнаружение слабых ключей: Предупреждает о предсказуемых ключах
 
-Randomness
-Nonce uniqueness: Guaranteed unique nonces for GCM
+Безопасная генерация: Криптографически случайные ключи через ОС RNG
 
-IV randomness: Secure random IVs for all modes
+Разделение ключей: Разные ключи для шифрования и MAC
 
-NIST compliant: Passes statistical randomness tests
+Случайность
+Уникальность nonce: Гарантированная уникальность nonce для GCM
 
-Examples
-File Integrity with Authentication
+Случайность IV: Безопасные случайные IV для всех режимов
 
-# 1. Create authenticated encrypted backup
-cryptocore --algorithm aes --mode gcm --encrypt \
-           --input database.db \
-           --output backup.enc \
-           --aad $(date -I)
+Соответствие NIST: Проходит статистические тесты на случайность
 
-# 2. Verify and restore
-cryptocore --algorithm aes --mode gcm --decrypt \
-           --key YOUR_KEY \
-           --input backup.enc \
-           --output restored.db \
-           --aad 2024-01-15
-Secure Message Exchange
+Примеры
+Целостность файлов с аутентификацией
 
-# Alice encrypts with AAD containing metadata
-cryptocore --mode gcm --encrypt \
-           --input message.txt \
-           --output message.enc \
-           --aad "from=alice&to=bob&date=2024-01-15"
+1. Создайте аутентифицированное зашифрованное резервное копирование
+cryptocore --algorithm aes --mode gcm --encrypt
+--input database.db
+--output backup.enc
+--aad $(date -I)
 
-# Bob decrypts and verifies metadata
-cryptocore --mode gcm --decrypt \
-           --key SHARED_KEY \
-           --input message.enc \
-           --output message.txt \
-           --aad "from=alice&to=bob&date=2024-01-15"
-Interoperability with OpenSSL
+2. Проверьте и восстановите
+cryptocore --algorithm aes --mode gcm --decrypt
+--key YOUR_KEY
+--input backup.enc
+--output restored.db
+--aad 2024-01-15
 
-# Encrypt with CryptoCore
+Безопасный обмен сообщениями
+
+Alice шифрует с AAD, содержащим метаданные
+cryptocore --mode gcm --encrypt
+--input message.txt
+--output message.enc
+--aad "from=alice&to=bob&date=2024-01-15"
+
+Bob расшифровывает и проверяет метаданные
+cryptocore --mode gcm --decrypt
+--key SHARED_KEY
+--input message.enc
+--output message.txt
+--aad "from=alice&to=bob&date=2024-01-15"
+
+Совместимость с OpenSSL
+
+Зашифруйте с помощью CryptoCore
 cryptocore --mode gcm --encrypt --key KEY --input plain.txt --output crypto.gcm
 
-# Decrypt with OpenSSL (if compatible)
-openssl enc -aes-256-gcm -d -K KEY -iv $(head -c12 crypto.gcm | xxd -p) \
-    -aad AAD_HEX -in <(tail -c+13 crypto.gcm | head -c-16) -out plain.txt
-Security Considerations
-Key Management: Always use cryptographically random keys
+Расшифруйте с помощью OpenSSL (если совместимо)
+openssl enc -aes-256-gcm -d -K KEY -iv $(head -c12 crypto.gcm | xxd -p)
+-aad AAD_HEX -in <(tail -c+13 crypto.gcm | head -c-16) -out plain.txt
 
-Nonce Reuse: Never reuse nonces with the same key in GCM
+Вопросы безопасности
+Управление ключами: Всегда используйте криптографически случайные ключи
 
-AAD Integrity: AAD is authenticated but not encrypted
+Повторное использование Nonce: Никогда не используйте повторно nonce с одним и тем же ключом в GCM
 
-Mode Selection: Use GCM or Encrypt-then-MAC for sensitive data
+Целостность AAD: AAD аутентифицируется, но не шифруется
 
-Key Size: Use 256-bit keys when possible
+Выбор режима: Используйте GCM или Encrypt-then-MAC для конфиденциальных данных
 
- Troubleshooting
-Common Issues
-"Authentication failed": AAD mismatch or data tampering
+Размер ключа: Используйте 256-битные ключи, когда это возможно
 
-"Invalid key length": GCM requires 16/24/32 byte keys
+Устранение неполадок
+Распространенные проблемы
+"Аутентификация не удалась": Несоответствие AAD или изменение данных
 
-"File too short": Corrupted or incomplete encrypted file
+"Недопустимая длина ключа": GCM требует 16/24/32-байтовые ключи
 
-"Invalid hex": Key/IV/AAD must be valid hexadecimal
+"Файл слишком короткий": Поврежденный или неполный зашифрованный файл
 
-Debug Mode
+"Недопустимый hex": Ключ/IV/AAD должны быть допустимыми шестнадцатеричными значениями
 
-# Add verbose output
+Режим отладки
+
+Добавьте подробный вывод
 python -m src.cryptocore --mode gcm --encrypt --input test.txt -v
 
-# Key Derivation (Sprint 7)
+Вывод ключей (Спринт 7)
+Обзор
+CryptoCore теперь поддерживает безопасный вывод ключей из паролей с использованием PBKDF2-HMAC-SHA256 (RFC 2898) и функций иерархии ключей.
 
-## Overview
+Быстрый старт
+Базовый вывод ключей
+Выведите ключ с указанной солью
+cryptocore derive --password "MySecurePassword123!"
+--salt 1234567890abcdef1234567890abcdef
+--iterations 100000
+--length 32
 
-CryptoCore now supports secure key derivation from passwords using **PBKDF2-HMAC-SHA256** (RFC 2898) and key hierarchy functions.
+Выведите ключ с автогенерированной солью
+cryptocore derive --password "AnotherPassword"
+--iterations 500000
+--length 16
 
-## Quick Start
-
-### Basic Key Derivation
-
-# Derive key with specified salt
-cryptocore derive --password "MySecurePassword123!" \
-                 --salt 1234567890abcdef1234567890abcdef \
-                 --iterations 100000 \
-                 --length 32
-
-# Derive key with auto-generated salt
-cryptocore derive --password "AnotherPassword" \
-                 --iterations 500000 \
-                 --length 16
-Complete Usage
-PBKDF2 Key Derivation
+Полное использование
+Вывод ключей PBKDF2
 bash
-# Basic derivation (output: KEY_HEX SALT_HEX)
-cryptocore derive --password <password> \
-                 --salt <hex_salt> \
-                 --iterations <count> \
-                 --length <bytes>
 
-# Save to file
-cryptocore derive --password "app_key" \
-                 --salt fixedappsalt \
-                 --iterations 100000 \
-                 --length 32 \
-                 --output derived_key.txt
+Базовый вывод (вывод: KEY_HEX SALT_HEX)
+cryptocore derive --password <password>
+--salt <hex_salt>
+--iterations <count>
+--length <bytes>
 
-# Output raw binary key
-cryptocore derive --password "secret" \
-                 --salt 1234567890abcdef \
-                 --iterations 10000 \
-                 --length 16 \
-                 --raw \
-                 --output key.bin
-Command Options
-Option	Required	Default	Description
---password	Yes	-	Password string
---salt	No	Auto-generated	Salt as hex string
---iterations	No	100,000	Iteration count
---length	No	32	Key length in bytes
---algorithm	No	pbkdf2	KDF algorithm
---output	No	stdout	Output file
---raw	No	false	Output raw binary
-Security Guidelines
-1. Iteration Count
-Minimum: 10,000 iterations
+Сохраните в файл
+cryptocore derive --password "app_key"
+--salt fixedappsalt
+--iterations 100000
+--length 32
+--output derived_key.txt
 
-Recommended: 100,000+ iterations
+Выведите сырой бинарный ключ
+cryptocore derive --password "secret"
+--salt 1234567890abcdef
+--iterations 10000
+--length 16
+--raw
+--output key.bin
 
-High security: 1,000,000+ iterations
+Параметры команд
+Опция Обязательный По умолчанию Описание
+--password Да - Строка пароля
+--salt Нет Автогенерируется Соль как шестнадцатеричная строка
+--iterations Нет 100,000 Количество итераций
+--length Нет 32 Длина ключа в байтах
+--algorithm Нет pbkdf2 Алгоритм KDF
+--output Нет stdout Выходной файл
+--raw Нет false Вывод сырых бинарных данных
 
-2. Salt Requirements
-Always use a random salt for each password
+Рекомендации по безопасности
 
-Minimum length: 16 bytes (128 bits)
+Количество итераций
+Минимум: 10,000 итераций
 
-Recommended: 32 bytes (256 bits)
+Рекомендуется: 100,000+ итераций
 
-3. Password Guidelines
-Use strong, complex passwords
+Высокая безопасность: 1,000,000+ итераций
 
-Minimum 12 characters
+Требования к соли
+Всегда используйте случайную соль для каждого пароля
 
-Include uppercase, lowercase, numbers, symbols
+Минимальная длина: 16 байт (128 бит)
 
-4. Key Storage
-Never store passwords - store derived keys
+Рекомендуется: 32 байта (256 бит)
 
-Use secure key storage solutions
+Рекомендации по паролям
+Используйте сильные, сложные пароли
 
-Consider hardware security modules for production
+Минимум 12 символов
 
-Examples
-1. Generate Encryption Key
+Включайте прописные, строчные буквы, цифры, символы
+
+Хранение ключей
+Никогда не храните пароли - храните полученные ключи
+
+Используйте безопасные решения для хранения ключей
+
+Рассмотрите аппаратные модули безопасности для производства
+
+Примеры
+
+Сгенерируйте ключ шифрования
 bash
-cryptocore derive --password "DatabaseMasterKey2024!" \
-                 --iterations 500000 \
-                 --length 32 \
-                 --output db_encryption_key.txt
-2. Create Key Hierarchy
+cryptocore derive --password "DatabaseMasterKey2024!"
+--iterations 500000
+--length 32
+--output db_encryption_key.txt
+
+Создайте иерархию ключей
 python
 from src.kdf.hkdf import derive_key
 
-# Master key from PBKDF2
+Мастер-ключ из PBKDF2
 master_key = bytes.fromhex("your_derived_key_hex")
 
-# Derive specific use keys
+Выведите ключи для конкретного использования
 encryption_key = derive_key(master_key, "database_encryption", 32)
 auth_key = derive_key(master_key, "api_authentication", 32)
 signing_key = derive_key(master_key, "jwt_signing", 32)
-3. RFC 6070 Test Vectors
+
+Тестовые векторы RFC 6070
 bash
-# Test vector 1
-cryptocore derive --password "password" \
-                 --salt 73616c74 \
-                 --iterations 1 \
-                 --length 20
-# Expected: 0c60c80f961f0e71f3a9b524af6012062fe037a6
 
-# Test vector 2
-cryptocore derive --password "password" \
-                 --salt 73616c74 \
-                 --iterations 2 \
-                 --length 20
-# Expected: ea6c014dc72d6f8ccd1ed92ace1d41f0d8de8957
-Technical Details
-PBKDF2 Implementation
-Standard: RFC 2898 compliant
+Тестовый вектор 1
+cryptocore derive --password "password"
+--salt 73616c74
+--iterations 1
+--length 20
 
-Hash function: HMAC-SHA256 (from scratch)
+Ожидается: 0c60c80f961f0e71f3a9b524af6012062fe037a6
+Тестовый вектор 2
+cryptocore derive --password "password"
+--salt 73616c74
+--iterations 2
+--length 20
 
-Key stretching: Configurable iteration count
+Ожидается: ea6c014dc72d6f8ccd1ed92ace1d41f0d8de8957
+Технические детали
+Реализация PBKDF2
+Стандарт: Соответствует RFC 2898
 
-Salt support: Arbitrary length salts
+Хэш-функция: HMAC-SHA256 (с нуля)
 
-Key Hierarchy Function
-Function: derive_key(master_key, context, length)
+Растяжение ключа: Настраиваемое количество итераций
 
-Method: HMAC-based deterministic derivation
+Поддержка соли: Соли произвольной длины
 
-Context separation: Unique keys for different purposes
+Функция иерархии ключей
+Функция: derive_key(master_key, context, length)
 
-Arbitrary length: Supports any key length
+Метод: Детерминированный вывод на основе HMAC
 
-Testing
-Run All Tests
+Разделение контекста: Уникальные ключи для разных целей
+
+Произвольная длина: Поддерживает любую длину ключа
+
+Тестирование
+Запустите все тесты
 
 python -m pytest tests/test_kdf.py -v
 
-# RFC 6070 test vectors
+Тестовые векторы RFC 6070
 python -m pytest tests/test_kdf.py::TestPBKDF2::test_rfc_6070_vector_1 -v
 
-# CLI tests
+Тесты CLI
 python -m pytest tests/test_kdf.py::TestCLIDerive -v
 
-# Performance tests
+Тесты производительности
 python -m pytest tests/test_kdf.py::TestPBKDF2::test_performance -v
-Interoperability with OpenSSL
 
-# Compare with OpenSSL
-cryptocore derive --password "test" \
-                 --salt 1234567890abcdef \
-                 --iterations 10000 \
-                 --length 32 \
-                 --raw > cryptocore_key.bin
+Совместимость с OpenSSL
 
-openssl kdf -keylen 32 \
-           -kdfopt pass:test \
-           -kdfopt hexsalt:1234567890abcdef \
-           -kdfopt iter:10000 \
-           PBKDF2 > openssl_key.bin
+Сравните с OpenSSL
+cryptocore derive --password "test"
+--salt 1234567890abcdef
+--iterations 10000
+--length 32
+--raw > cryptocore_key.bin
+
+openssl kdf -keylen 32
+-kdfopt pass:test
+-kdfopt hexsalt:1234567890abcdef
+-kdfopt iter:10000
+PBKDF2 > openssl_key.bin
 
 diff cryptocore_key.bin openssl_key.bin
-Performance Considerations
-Iteration Count vs Time
-Iterations	Approx. Time (1 core)	Security Level
-10,000	0.01s	Basic
-100,000	0.1s	Standard
-500,000	0.5s	High
-1,000,000	1.0s	Very High
-Memory Usage
-Constant memory: Processes in fixed-size chunks
 
-No disk caching: All operations in memory
+Соображения производительности
+Количество итераций против времени
+Итерации Примерное время (1 ядро) Уровень безопасности
+10,000 0.01s Базовый
+100,000 0.1s Стандартный
+500,000 0.5s Высокий
+1,000,000 1.0s Очень высокий
 
-Secure cleanup: Passwords cleared after use
+Использование памяти
+Постоянная память: Обрабатывает частями фиксированного размера
 
-Common Issues
-1. "Invalid hex salt"
+Нет кэширования на диске: Все операции в памяти
+
+Безопасная очистка: Пароли очищаются после использования
+
+Распространенные проблемы
+
+"Недопустимая шестнадцатеричная соль"
 bash
-# Error: Salt must be valid hex
+
+Ошибка: Соль должна быть допустимым шестнадцатеричным значением
 cryptocore derive --password "test" --salt "not_hex"
 
-# Solution: Use hex or let tool generate salt
+Решение: Используйте hex или позвольте инструменту сгенерировать соль
 cryptocore derive --password "test" --salt "1234567890abcdef"
-2. Low iteration warning
+
+Предупреждение о малом количестве итераций
 bash
-# Warning appears for < 100,000 iterations
+
+Появляется предупреждение для < 100,000 итераций
 cryptocore derive --password "test" --iterations 1000
 
-# Solution: Increase iterations
+Решение: Увеличьте количество итераций
 cryptocore derive --password "test" --iterations 100000
-3. Password with special characters
+
+Пароль со специальными символами
 bash
-# Use quotes for shell interpretation
+
+Используйте кавычки для интерпретации оболочкой
 cryptocore derive --password "My!Pass@word#123$"
 
-# Or escape characters
-cryptocore derive --password My\!Pass\@word\#123\$
-References
-RFC 2898: PBKDF2 Specification
+Или экранируйте символы
+cryptocore derive --password My!Pass@word#123$
 
-RFC 6070: PBKDF2 Test Vectors
+Ссылки
+RFC 2898: Спецификация PBKDF2
 
-NIST SP 800-132: Password-Based Key Derivation
+RFC 6070: Тестовые векторы PBKDF2
 
-OWASP Password Storage Cheat Sheet
-## Инструкция по установке и тестированию:
-## Установите обновленный пакет:
+NIST SP 800-132: Вывод ключей на основе паролей
 
+OWASP Cheat Sheet по хранению паролей
 
+Инструкция по установке и тестированию:
+Установите обновленный пакет:
 pip install -e .
+
 Запустите тесты:
 
-
 python run_tests.py
-# Или отдельно тесты KDF:
+
+Или отдельно тесты KDF:
 python -m pytest tests/test_kdf.py -v
+
 Примеры использования:
 
-# Базовое получение ключа
+Базовое получение ключа
 cryptocore derive --password "MyPassword123!" --iterations 100000
 
-# RFC тестовые векторы
+RFC тестовые векторы
 cryptocore derive --password "password" --salt 73616c74 --iterations 1 --length 20
 
-# Сохранение в файл
+Сохранение в файл
 cryptocore derive --password "app_key" --iterations 500000 --output app_key.txt
-## Запустите пример:
+
+Запустите пример:
 python examples/key_derivation_example.py
-# CryptoCore 🛡️
 
-[![Python Version](https://img.shields.io/badge/python-3.6%2B-blue.svg)](https://www.python.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Test Status](https://img.shields.io/badge/tests-passing-brightgreen.svg)](#testing)
+CryptoCore 🛡️
+https://img.shields.io/badge/python-3.6%252B-blue.svg
+https://img.shields.io/badge/License-MIT-yellow.svg
+https://img.shields.io/badge/tests-passing-brightgreen.svg
 
-**CryptoCore** is a comprehensive cryptographic library and command-line tool implemented from scratch for educational purposes. It provides production-grade cryptographic primitives with a focus on security, correctness, and learning.
+CryptoCore - это комплексная криптографическая библиотека и инструмент командной строки, реализованные с нуля для образовательных целей. Он предоставляет криптографические примитивы производственного уровня с акцентом на безопасность, корректность и обучение.
 
-##  Features
+Возможности
+Шифрование/Расшифровка
+AES-128 с несколькими режимами:
 
-### Encryption/Decryption
-- **AES-128** with multiple modes:
-  - Basic: ECB, CBC, CFB, OFB, CTR
-  - Authenticated: GCM (Galois/Counter Mode), Encrypt-then-MAC
-- **Automatic key generation** with secure RNG
-- **IV/Nonce handling** with proper file formats
-- **PKCS#7 padding** where required
-- **Associated Data (AAD)** support for authenticated modes
+Базовые: ECB, CBC, CFB, OFB, CTR
 
-### Hash Functions (Implemented from scratch)
-- **SHA-256** (NIST FIPS 180-4)
-- **SHA3-256** (Keccak sponge construction)
-- **Streaming support** for large files
-- **NIST test vector** compliance
+Аутентифицированные: GCM (Galois/Counter Mode), Encrypt-then-MAC
 
-### Message Authentication Codes
-- **HMAC-SHA256** (RFC 2104)
-- **AES-CMAC** (NIST SP 800-38B) - bonus feature
-- **Constant-time verification** to prevent timing attacks
-- **Streaming HMAC** for large files
+Автоматическая генерация ключей с безопасным ГСЧ
 
-### Key Derivation (Sprint 7)
-- **PBKDF2-HMAC-SHA256** (RFC 2898)
-- **Key hierarchy functions** for deriving subkeys
-- **RFC 6070 test vector** compliance
-- **Secure salt generation** and management
+Обработка IV/Nonce с правильными форматами файлов
 
-### Cryptographically Secure RNG
-- **OS-provided randomness** (`os.urandom()`)
-- **Weak key detection** and warnings
-- **Statistical randomness** verification
+Дополнение PKCS#7 там, где это требуется
 
-##  Quick Start
+Поддержка ассоциированных данных (AAD) для аутентифицированных режимов
 
-### Installation
+Хэш-функции (Реализованы с нуля)
+SHA-256 (NIST FIPS 180-4)
 
+SHA3-256 (губчатая конструкция Keccak)
 
-# Clone the repository
+Поддержка потоковой обработки для больших файлов
+
+Соответствие тестовым векторам NIST
+
+Коды аутентификации сообщений
+HMAC-SHA256 (RFC 2104)
+
+AES-CMAC (NIST SP 800-38B) - дополнительная функция
+
+Проверка за постоянное время для предотвращения атак по времени
+
+Потоковый HMAC для больших файлов
+
+Вывод ключей (Спринт 7)
+PBKDF2-HMAC-SHA256 (RFC 2898)
+
+Функции иерархии ключей для вывода подчиненных ключей
+
+Соответствие тестовым векторам RFC 6070
+
+Безопасная генерация и управление солью
+
+Криптографически стойкий ГСЧ
+Случайность, предоставляемая ОС (os.urandom())
+
+Обнаружение слабых ключей и предупреждения
+
+Статистическая проверка случайности
+
+Быстрый старт
+Установка
+Клонируйте репозиторий
 git clone https://github.com/yourusername/cryptocore.git
 cd cryptocore
 
-# Install in development mode
+Установите в режиме разработки
 pip install -e .
 
-# Install dependencies
+Установите зависимости
 pip install -r requirements.txt
-Basic Usage
 
-# Encrypt a file (auto-generates key)
+Базовое использование
+
+Зашифруйте файл (автогенерирует ключ)
 cryptocore --algorithm aes --mode cbc --encrypt --input secret.txt --output secret.enc
 
-# Save the displayed key!
-# Decrypt the file
+Сохраните отображенный ключ!
+Расшифруйте файл
 cryptocore --algorithm aes --mode cbc --decrypt --key YOUR_KEY --input secret.enc --output secret.txt
 
-# Compute SHA-256 hash
+Вычислите хэш SHA-256
 cryptocore dgst --algorithm sha256 --input file.iso
 
-# Generate HMAC for authentication
+Сгенерируйте HMAC для аутентификации
 cryptocore dgst --algorithm sha256 --hmac --key YOUR_KEY --input firmware.bin
 
-# Derive key from password
+Выведите ключ из пароля
 cryptocore derive --password "MySecurePassword123!" --iterations 100000 --length 32
-Documentation
-Comprehensive documentation is available in the docs/ directory:
 
-API Reference - Complete API documentation
+Документация
+Полная документация доступна в каталоге docs/:
 
-User Guide - CLI usage with examples
+API Reference - Полная документация API
 
-Development Guide - Contributing and development
+User Guide - Использование CLI с примерами
 
-Examples - Code examples for common use cases
+Development Guide - Разработка и внесение вклада
 
+Examples - Примеры кода для распространенных случаев использования
 
-CryptoCore includes a comprehensive test suite:
+CryptoCore включает комплексный набор тестов:
 
-
-# Run all tests
+Запустите все тесты
 python run_tests.py
 
-# Run specific test categories
-python run_tests.py --unit           # Unit tests
-python run_tests.py --integration    # Integration tests
-python run_tests.py --performance    # Performance tests
-python run_tests.py --interop        # Interoperability tests
+Запустите конкретные категории тестов
+python run_tests.py --unit # Модульные тесты
+python run_tests.py --integration # Интеграционные тесты
+python run_tests.py --performance # Тесты производительности
+python run_tests.py --interop # Тесты совместимости
 
-# Run with pytest directly
+Запустите напрямую с помощью pytest
 python -m pytest tests/ -v
 
-# Generate coverage report
+Сгенерируйте отчет о покрытии
 python -m pytest --cov=src tests/ --cov-report=html
 
-
- Project Structure
+Структура проекта
 text
 cryptocore/
-├── src/                           # Source code
-│   ├── cryptocore.py              # Main CLI entry point
-│   ├── cli_parser.py              # Command-line parsing
-│   ├── file_io.py                 # File I/O utilities
-│   ├── csprng.py                  # Cryptographically secure RNG
-│   ├── modes/                     # Encryption modes
-│   ├── hash/                      # Hash functions (from scratch)
-│   ├── mac/                       # Message Authentication Codes
-│   └── kdf/                       # Key Derivation Functions
-├── tests/                         # Comprehensive test suite
-│   ├── unit/                      # Unit tests
-│   ├── integration/               # Integration tests
-│   ├── vectors/                   # Known-answer test vectors
-│   └── run_tests.py              # Test runner
-├── docs/                          # Documentation
-│   ├── API.md
-│   ├── USERGUIDE.md
-│   └── DEVELOPMENT.md
-├── examples/                      # Usage examples
-├── requirements.txt               # Python dependencies
-├── setup.py                       # Package setup
-├── pyproject.toml                 # Build configuration
-├── .pylintrc                      # Code quality
-├── CHANGELOG.md                   # Version history
-├── CONTRIBUTING.md                # Contribution guidelines
-├── SECURITY.md                    # Security policy
-├── CODE_OF_CONDUCT.md             # Community guidelines
-└── LICENSE                        # MIT License
- Security Features
-Implemented Protections
-Constant-time operations to prevent timing attacks
+├── src/ # Исходный код
+│ ├── cryptocore.py # Основная точка входа CLI
+│ ├── cli_parser.py # Разбор командной строки
+│ ├── file_io.py # Утилиты ввода-вывода файлов
+│ ├── csprng.py # Криптографически стойкий ГСЧ
+│ ├── modes/ # Режимы шифрования
+│ ├── hash/ # Хэш-функции (с нуля)
+│ ├── mac/ # Коды аутентификации сообщений
+│ └── kdf/ # Функции вывода ключей
+├── tests/ # Комплексный набор тестов
+│ ├── unit/ # Модульные тесты
+│ ├── integration/ # Интеграционные тесты
+│ ├── vectors/ # Тестовые векторы с известными ответами
+│ └── run_tests.py # Запускатор тестов
+├── docs/ # Документация
+│ ├── API.md
+│ ├── USERGUIDE.md
+│ └── DEVELOPMENT.md
+├── examples/ # Примеры использования
+├── requirements.txt # Зависимости Python
+├── setup.py # Настройка пакета
+├── pyproject.toml # Конфигурация сборки
+├── .pylintrc # Качество кода
+├── CHANGELOG.md # История версий
+├── CONTRIBUTING.md # Рекомендации по внесению вклада
+├── SECURITY.md # Политика безопасности
+├── CODE_OF_CONDUCT.md # Правила сообщества
+└── LICENSE # Лицензия MIT
 
-Secure memory clearing for sensitive data
+Реализованные защиты
+Операции за постоянное время для предотвращения атак по времени
 
-Input validation on all parameters
+Безопасная очистка памяти для конфиденциальных данных
 
-Authentication before decryption (GCM, HMAC)
+Валидация ввода всех параметров
 
-No information leakage in error messages
+Аутентификация перед расшифровкой (GCM, HMAC)
 
-Security Best Practices
-Use authenticated encryption (GCM or Encrypt-then-MAC) for sensitive data
+Нет утечки информации в сообщениях об ошибках
 
-Never reuse nonces with the same key in GCM mode
+Рекомендации по безопасности
+Используйте аутентифицированное шифрование (GCM или Encrypt-then-MAC) для конфиденциальных данных
 
-Use cryptographically secure random keys
+Никогда не используйте повторно nonce с одним и тем же ключом в режиме GCM
 
-Perform authentication verification before using data
+Используйте криптографически стойкие случайные ключи
 
-Use PBKDF2 with ≥100,000 iterations for key derivation
+Выполняйте проверку аутентификации перед использованием данных
 
-Performance
-Benchmarks (on typical hardware)
+Используйте PBKDF2 с ≥100,000 итерациями для вывода ключей
+
+Производительность
+Бенчмарки (на типичном оборудовании)
 text
 PBKDF2-HMAC-SHA256:
-  1,000 iterations:     0.003s
-  10,000 iterations:    0.030s
-  100,000 iterations:   0.300s
-  500,000 iterations:   1.500s
+1,000 итераций: 0.003s
+10,000 итераций: 0.030s
+100,000 итераций: 0.300s
+500,000 итераций: 1.500s
 
-Hash Functions (1MB data):
-  SHA-256:              0.050s  (~20 MB/s)
-  SHA3-256:             0.080s  (~12 MB/s)
+Хэш-функции (1MB данных):
+SHA-256: 0.050s (~20 MB/s)
+SHA3-256: 0.080s (~12 MB/s)
 
-Encryption (AES-128 CBC, 1MB):
-  Encryption:           0.020s  (~50 MB/s)
-  Decryption:           0.020s  (~50 MB/s)
-Note: These are educational implementations. Production libraries are significantly faster.
+Шифрование (AES-128 CBC, 1MB):
+Шифрование: 0.020s (~50 MB/s)
+Расшифровка: 0.020s (~50 MB/s)
 
-Contributing
-We welcome contributions! Please see our Contributing Guidelines for details.
+Примечание: Это образовательные реализации. Производственные библиотеки значительно быстрее.
 
-Development Setup
+Внесение вклада
+Мы приветствуем вклад! Пожалуйста, ознакомьтесь с нашими Рекомендациями по внесению вклада для деталей.
 
-# Clone and set up development environment
+Настройка разработки
+
+Клонируйте и настройте среду разработки
 git clone https://github.com/yourusername/cryptocore.git
 cd cryptocore
 python -m venv venv
-source venv/bin/activate  # Linux/macOS
-# .\venv\Scripts\Activate.ps1  # Windows
+source venv/bin/activate # Linux/macOS
+
+.\venv\Scripts\Activate.ps1 # Windows
 pip install -e .[dev]
-Code Standards
-Follow PEP 8 style guide
 
-Write comprehensive docstrings
+Стандарты кода
+Следуйте руководству по стилю PEP 8
 
-Add type hints for new functions
+Пишите комплексные докстринги
 
-Write tests for new features
+Добавляйте подсказки типов для новых функций
 
-Update documentation
+Пишите тесты для новых функций
 
-## Learning Resources
-Cryptographic Standards Implemented
+Обновляйте документацию
+
+Ресурсы для обучения
+Реализованные криптографические стандарты
 AES: NIST FIPS 197
 
 SHA-256: NIST FIPS 180-4
@@ -1717,82 +1820,82 @@ HMAC: RFC 2104
 
 PBKDF2: RFC 2898
 
-Useful References
-NIST Cryptographic Standards
+Полезные ссылки
+Криптографические стандарты NIST
 
-RFC Repository
+Репозиторий RFC
 
-Cryptography Engineering Book
+Книга "Cryptography Engineering"
 
-## Security Considerations
-Important Notes
-Educational Purpose: CryptoCore is primarily for learning cryptographic implementations.
+Вопросы безопасности
+Важные замечания
+Образовательная цель: CryptoCore в первую очередь предназначен для изучения криптографических реализаций.
 
-Not FIPS Validated: Implementations are from specification, not certified.
+Не валидирован FIPS: Реализации соответствуют спецификациям, но не сертифицированы.
 
-Production Use: For production systems, use validated libraries like OpenSSL or libsodium.
+Использование в производстве: Для производственных систем используйте валидированные библиотеки, такие как OpenSSL или libsodium.
 
-Security Audits: This code has not undergone formal security audits.
+Аудиты безопасности: Этот код не проходил формальные аудиты безопасности.
 
-When to Use CryptoCore
-Learning cryptography implementation
+Когда использовать CryptoCore
+Изучение реализации криптографии
 
-Educational demonstrations
+Образовательные демонстрации
 
-Testing and comparison
+Тестирование и сравнение
 
-Non-critical applications
+Некритичные приложения
 
-When to Use Other Tools
-Production systems (use OpenSSL, libsodium)
+Когда использовать другие инструменты
+Производственные системы (используйте OpenSSL, libsodium)
 
-Regulatory compliance (use FIPS-validated libraries)
+Соответствие нормативным требованиям (используйте библиотеки, валидированные FIPS)
 
-High-security applications (use hardware security modules)
+Приложения высокой безопасности (используйте аппаратные модули безопасности)
 
-## License
-CryptoCore is released under the MIT License. See LICENSE file for details.
+Лицензия
+CryptoCore выпущен под лицензией MIT. См. файл LICENSE для деталей.
 
-## Acknowledgments
-NIST for cryptographic standards
+Благодарности
+NIST за криптографические стандарты
 
-IETF for RFC specifications
+IETF за спецификации RFC
 
-Cryptography community for test vectors and guidance
+Криптографическому сообществу за тестовые векторы и руководство
 
-Course instructors for project requirements and feedback
+Преподавателям курса за требования к проекту и обратную связь
 
-## Support
-Documentation: See docs/ directory
+Поддержка
+Документация: См. каталог docs/
 
-Issues: GitHub Issues
+Проблемы: GitHub Issues
 
-Security: See SECURITY.md for reporting vulnerabilities
+Безопасность: См. SECURITY.md для сообщения об уязвимостях
 
-### Инструкция по установке и тестированию:
+Инструкция по установке и тестированию:
 Установите полный пакет:
 
-
 pip install -e .[dev]
+
 Запустите все проверки:
 
 python scripts/check_all.py
+
 Запустите все тесты:
 
-
 python run_tests.py
+
 Проверьте документацию:
 
-
-# API документация
+API документация
 cat docs/API.md | head -50
 
-# Руководство пользователя
+Руководство пользователя
 cat docs/USERGUIDE.md | head -50
 
-# Руководство разработчика
+Руководство разработчика
 cat docs/DEVELOPMENT.md | head -50
-Запустите примеры:
 
+Запустите примеры:
 
 python examples/basic_usage.py
