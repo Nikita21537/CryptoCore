@@ -3,7 +3,7 @@ import tempfile
 import os
 import subprocess
 import sys
-from src.cryptocore.hash import SHA256, SHA3_256, hash_data_hex, hash_file
+from src.hash import SHA256, SHA3_256, hash_data_hex, hash_file
 
 
 class TestSHA256(unittest.TestCase):
@@ -370,4 +370,5 @@ class TestCLIHash(unittest.TestCase):
 
 
 if __name__ == '__main__':
+
     unittest.main()
