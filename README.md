@@ -1,8 +1,145 @@
 ## CryptoCore - AES-128 ECB Инструмент Шифрования/Расшифровки
 # Инструмент командной строки для режима AES-128 ECB шифрования и расшифровки с PKCS#7 дополнением.
 
+## Инструкции по сборке
+sudo apt install git
 
+sudo apt update
 
+sudo apt install python3-venv python3-pip python3-full
+
+git clone https://github.com/kdqwrt/cryptocore.git
+
+python3 -m venv venv
+
+source venv/bin/activate
+
+cd cryptocore
+
+dir 
+
+pip install --upgrade pip
+
+pip install -e .
+
+pip install setuptools wheel
+
+python all_tests.py
+Подготовка тестовых файлов
+1. Создайте тестовые файлы
+
+# Windows (CMD/PowerShell):
+echo "Hello, CryptoCore! This is a test message for hashing." > test.txt
+echo "Another test file for encryption testing." > data.txt
+echo "Sensitive data that needs protection." > secret.txt
+
+# Linux/macOS:
+echo "Hello, CryptoCore! This is a test message for hashing." > test.txt
+echo "Another test file for encryption testing." > data.txt
+echo "Sensitive data that needs protection." > secret.txt
+
+# Создайте бинарный файл для теста (1KB)
+fsutil file createnew data.bin 1024  # Windows
+# или
+dd if=/dev/urandom of=data.bin bs=1024 count=1  # Linux/macOS
+🔍 Проверка команды 1: Хэширование SHA-256
+
+# Простое хэширование
+cryptocore dgst --algorithm sha256 --input test.txt
+
+# Пример вывода:
+# 95b5fd0301cddebbb0d8efe5b35268124b42d2cf02b0ef37659df29a9b8c42da  test.txt
+
+# Проверьте с другими инструментами (если есть):
+# Windows (если установлен OpenSSL):
+openssl dgst -sha256 test.txt
+
+# Linux/macOS:
+sha256sum test.txt
+
+# Сравните хэши - они должны совпадать
+🔍 Проверка команды 2: Хэширование SHA3-256 с выводом в файл
+
+# Хэширование с сохранением в файл
+cryptocore dgst --algorithm sha3-256 --input data.bin --output hash.txt
+
+# Проверьте содержимое файла hash.txt
+type hash.txt  # Windows
+cat hash.txt   # Linux/macOS
+
+# Проверьте длину хэша (должно быть 64 hex символа)
+python -c "with open('hash.txt', 'r') as f: print('Length:', len(f.read().strip().split()[0]))"
+🔐 Проверка команды 3: HMAC
+bash
+# Создайте тестовое сообщение
+echo "Important message that needs authentication" > message.txt
+
+# Создайте HMAC
+cryptocore dgst --algorithm sha256 --hmac --key 00112233445566778899aabbccddeeff --input message.txt
+
+# Пример вывода:
+# d5fa59dcc687cfabfed8a79e19f6a9f3dc3bf576bc468ebda01e3b88480a89c0  message.txt
+
+# Сохраните HMAC для последующей проверки
+cryptocore dgst --algorithm sha256 --hmac --key 00112233445566778899aabbccddeeff --input message.txt --output message.hmac
+🔒 Проверка команды 4: Шифрование CBC режим
+Создайте ключ:
+
+# Используем тестовый ключ (замените на свой для безопасности)
+set KEY=000102030405060708090a0b0c0d0e0f1112131415161718191a1b1c1d1e1f20
+echo %KEY% > key_hex.txt
+Шифрование:
+
+# Шифрование в режиме CBC
+cryptocore enc --algorithm aes --mode cbc --encrypt --key 000102030405060708090a0b0c0d0e0f1112131415161718191a1b1c1d1e1f20 --input secret.txt --output cipher_cbc.bin
+
+# Проверьте, что файл создан
+dir cipher_cbc.bin  # Windows
+ls -la cipher_cbc.bin  # Linux/macOS
+Расшифровка и проверка:
+
+# Расшифруйте обратно
+cryptocore enc --algorithm aes --mode cbc --decrypt --key 000102030405060708090a0b0c0d0e0f1112131415161718191a1b1c1d1e1f20 --input cipher_cbc.bin --output decrypted_cbc.txt
+
+# Сравните с оригиналом
+fc secret.txt decrypted_cbc.txt  # Windows
+diff secret.txt decrypted_cbc.txt  # Linux/macOS
+
+# Если файлы идентичны - шифрование работает правильно
+ Проверка команды 5: Шифрование CTR режим
+
+# Шифрование в режиме CTR (потоковый шифр)
+cryptocore enc --algorithm aes --mode ctr --encrypt --key 000102030405060708090a0b0c0d0e0f1112131415161718191a1b1c1d1e1f20 --input data.txt --output data_ctr.enc
+
+# Расшифровка
+cryptocore enc --algorithm aes --mode ctr --decrypt --key 000102030405060708090a0b0c0d0e0f1112131415161718191a1b1c1d1e1f20 --input data_ctr.enc --output data_ctr_dec.txt
+
+# Проверка
+fc data.txt data_ctr_dec.txt  # Windows
+diff data.txt data_ctr_dec.txt  # Linux/macOS
+ Проверка команды 6: Вывод ключей PBKDF2
+
+# Базовый вывод ключа
+cryptocore derive --password "MyPassword" --iterations 100000 --length 32
+
+# Вывод должен содержать:
+# 1. Сгенерированный ключ (64 hex символа)
+# 2. Соль (32 hex символа)
+# Пример: ada8ccc867d1f78e29deb3c05b46cc2be3f22285fb58e5eb77bc1759b3eb6164 fe54018bd3351930ed722023efef2dc1
+
+# Сохраните вывод для проверки
+cryptocore derive --password "MyPassword" --iterations 100000 --length 32 > derived_key.txt
+type derived_key.txt  # Проверьте содержимое
+ Проверка команды 7: Вывод ключей с указанной солью
+bash
+# Вывод ключа с конкретной солью
+cryptocore derive --password "secret" --salt 0011223344556677 --iterations 50000 --output key.txt
+
+# Проверьте содержимое файла key.txt
+type key.txt  # Windows
+cat key.txt   # Linux/macOS
+
+# Файл должен содержать ключ и соль
 # 1. Сначала создайте тестовый файл, если его нет
 echo "Hello CryptoCore! This is a test message." > test.txt
 
@@ -31,30 +168,7 @@ cryptocore derive --password "secret" --salt 0011223344556677 --iterations 50000
 
 # 4. Проверка
 fc test.txt test_dec.txt
-## Инструкции по сборке
-sudo apt install git
 
-sudo apt update
-
-sudo apt install python3-venv python3-pip python3-full
-
-git clone https://github.com/kdqwrt/cryptocore.git
-
-python3 -m venv venv
-
-source venv/bin/activate
-
-cd cryptocore
-
-dir 
-
-pip install --upgrade pip
-
-pip install -e .
-
-pip install setuptools wheel
-
-python all_tests.py
 ## Команды
 echo "Тестовые данные" > test.txt
 
@@ -1974,6 +2088,7 @@ cat docs/DEVELOPMENT.md | head -50
 # Запустите примеры:
 
 python examples/basic_usage.py
+
 
 
 
