@@ -7,7 +7,7 @@ import hashlib
 # Add src to path for imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../..'))
 
-from src.cryptocore.hash import SHA256, SHA3_256, hash_data_hex
+from src.hash import SHA256, SHA3_256, hash_data_hex
 
 
 class TestSHA256(unittest.TestCase):
@@ -385,4 +385,5 @@ class TestInteroperability(unittest.TestCase):
 
 
 if __name__ == '__main__':
+
     unittest.main()
