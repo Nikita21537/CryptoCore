@@ -3,7 +3,7 @@ import os
 import tempfile
 import subprocess
 import sys
-from src.cryptocore.modes.gcm import GCM, AuthenticationError
+from src.modes.gcm import GCM, AuthenticationError
 
 
 class TestGCM(unittest.TestCase):
@@ -194,4 +194,5 @@ class TestGCMNISTVectors(unittest.TestCase):
 
 
 if __name__ == '__main__':
+
     unittest.main()
