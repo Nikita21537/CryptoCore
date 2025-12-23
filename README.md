@@ -30,12 +30,16 @@ python all_tests.py
 
 # Windows (CMD/PowerShell):
 echo "Hello, CryptoCore! This is a test message for hashing." > test.txt
+
 echo "Another test file for encryption testing." > data.txt
+
 echo "Sensitive data that needs protection." > secret.txt
 
 # Linux/macOS:
 echo "Hello, CryptoCore! This is a test message for hashing." > test.txt
+
 echo "Another test file for encryption testing." > data.txt
+
 echo "Sensitive data that needs protection." > secret.txt
 
 # Создайте бинарный файл для теста (1KB)
@@ -2088,6 +2092,7 @@ cat docs/DEVELOPMENT.md | head -50
 # Запустите примеры:
 
 python examples/basic_usage.py
+
 
 
 
