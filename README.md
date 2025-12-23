@@ -3,7 +3,17 @@
 
 
 
+# 1. Сначала создайте тестовый файл, если его нет
+echo "Hello CryptoCore! This is a test message." > test.txt
 
+# 2. Шифрование (обратите внимание на два дефиса перед каждым параметром)
+cryptocore enc --algorithm aes --mode ecb --encrypt --key 000102030405060708090a0b0c0d0e0f --input test.txt --output test.enc
+
+# 3. Расшифровка
+cryptocore enc --algorithm aes --mode ecb --decrypt --key 000102030405060708090a0b0c0d0e0f --input test.enc --output test_dec.txt
+
+# 4. Проверка
+fc test.txt test_dec.txt
 ## Инструкции по сборке
 sudo apt install git
 
@@ -1947,5 +1957,6 @@ cat docs/DEVELOPMENT.md | head -50
 # Запустите примеры:
 
 python examples/basic_usage.py
+
 
 
