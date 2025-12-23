@@ -52,7 +52,7 @@ dd if=/dev/urandom of=data.bin bs=1024 count=1  # Linux/macOS
 cryptocore dgst --algorithm sha256 --input test.txt
 Автоматическая генерация ключа
 Правильная команда для шифрования с автогенерацией ключа:
-bash
+
 # Шифрование - ключ сгенерируется автоматически
 cryptocore enc --algorithm aes --mode cbc --encrypt --input secret.txt --output cipher_cbc.bin
 Пример вывода:
@@ -64,12 +64,12 @@ text
 [INFO] IV has been written to the beginning of the output file.
 Successfully encrypted secret.txt -> cipher_cbc.bin
 Затем для расшифровки используйте сгенерированный ключ:
-bash
+
 # Расшифровка с сохраненным ключом
 cryptocore enc --algorithm aes --mode cbc --decrypt --key 8f7c6d5e4b3a2910fedcba9876543210abcdeff0123456789abcdef01234567 --input cipher_cbc.bin --output decrypted.txt
 📝 Полный рабочий пример
 Шаг 1: Создайте тестовый файл
-bash
+
 echo "This is my secret message that needs encryption" > secret.txt
 Шаг 2: Шифрование с автогенерацией ключа
 # Ключ НЕ указываем - он сгенерируется автоматически
@@ -173,7 +173,7 @@ cryptocore derive --password "MyPassword" --iterations 100000 --length 32
 cryptocore derive --password "MyPassword" --iterations 100000 --length 32 > derived_key.txt
 type derived_key.txt  # Проверьте содержимое
  Проверка команды 7: Вывод ключей с указанной солью
-bash
+
 # Вывод ключа с конкретной солью
 cryptocore derive --password "secret" --salt 0011223344556677 --iterations 50000 --output key.txt
 
@@ -2130,6 +2130,7 @@ cat docs/DEVELOPMENT.md | head -50
 # Запустите примеры:
 
 python examples/basic_usage.py
+
 
 
 
