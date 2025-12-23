@@ -12,6 +12,23 @@ cryptocore enc --algorithm aes --mode ecb --encrypt --key 000102030405060708090a
 # 3. Расшифровка
 cryptocore enc --algorithm aes --mode ecb --decrypt --key 000102030405060708090a0b0c0d0e0f --input test.enc --output test_dec.txt
 
+
+
+# Хэширование
+cryptocore dgst --algorithm sha256 --input file.txt
+cryptocore dgst --algorithm sha3-256 --input data.bin --output hash.txt
+
+# HMAC
+cryptocore dgst --algorithm sha256 --hmac --key 00112233445566778899aabbccddeeff --input message.txt
+
+# Шифрование с разными режимами
+cryptocore enc --algorithm aes --mode cbc --encrypt --key <ключ> --input plain.txt --output cipher.bin
+cryptocore enc --algorithm aes --mode ctr --encrypt --key <ключ> --input data.txt --output data.enc
+
+# Вывод ключей
+cryptocore derive --password "MyPassword" --iterations 100000 --length 32
+cryptocore derive --password "secret" --salt 0011223344556677 --iterations 50000 --output key.txt
+
 # 4. Проверка
 fc test.txt test_dec.txt
 ## Инструкции по сборке
@@ -1957,6 +1974,7 @@ cat docs/DEVELOPMENT.md | head -50
 # Запустите примеры:
 
 python examples/basic_usage.py
+
 
 
 
