@@ -50,6 +50,44 @@ dd if=/dev/urandom of=data.bin bs=1024 count=1  # Linux/macOS
 
 # Простое хэширование
 cryptocore dgst --algorithm sha256 --input test.txt
+Автоматическая генерация ключа
+Правильная команда для шифрования с автогенерацией ключа:
+bash
+# Шифрование - ключ сгенерируется автоматически
+cryptocore enc --algorithm aes --mode cbc --encrypt --input secret.txt --output cipher_cbc.bin
+Пример вывода:
+text
+[INFO] Generated key: 8f7c6d5e4b3a2910fedcba9876543210abcdeff0123456789abcdef01234567
+[INFO] Key statistics: 128/256 bits set to 1 (50.0%)
+[INFO] Please save this key for decryption!
+[INFO] Generated IV (hex): a1b2c3d4e5f607182930a1b2c3d4e5f6
+[INFO] IV has been written to the beginning of the output file.
+Successfully encrypted secret.txt -> cipher_cbc.bin
+Затем для расшифровки используйте сгенерированный ключ:
+bash
+# Расшифровка с сохраненным ключом
+cryptocore enc --algorithm aes --mode cbc --decrypt --key 8f7c6d5e4b3a2910fedcba9876543210abcdeff0123456789abcdef01234567 --input cipher_cbc.bin --output decrypted.txt
+📝 Полный рабочий пример
+Шаг 1: Создайте тестовый файл
+bash
+echo "This is my secret message that needs encryption" > secret.txt
+Шаг 2: Шифрование с автогенерацией ключа
+# Ключ НЕ указываем - он сгенерируется автоматически
+cryptocore enc --algorithm aes --mode cbc --encrypt --input secret.txt --output encrypted.bin
+Сохраните ключ из вывода! Например:
+
+text
+Generated key: 1a2b3c4d5e6f7890fedcba98765432100123456789abcdef0123456789abcdef
+Шаг 3: Расшифровка с сохраненным ключом
+
+# Используйте ключ из шага 2
+cryptocore enc --algorithm aes --mode cbc --decrypt --key 1a2b3c4d5e6f7890fedcba98765432100123456789abcdef0123456789abcdef --input encrypted.bin --output decrypted.txt
+Шаг 4: Проверка
+
+# Сравните файлы
+fc secret.txt decrypted.txt  # Windows
+# или
+diff secret.txt decrypted.txt  # Linux/macOS
 
 # Пример вывода:
 # 95b5fd0301cddebbb0d8efe5b35268124b42d2cf02b0ef37659df29a9b8c42da  test.txt
@@ -2092,6 +2130,7 @@ cat docs/DEVELOPMENT.md | head -50
 # Запустите примеры:
 
 python examples/basic_usage.py
+
 
 
 
