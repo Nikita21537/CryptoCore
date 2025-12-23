@@ -1,7 +1,7 @@
 import unittest
 import os
 import tempfile
-from src.cryptocore.modes.ecb import AES_ECB, PKCS7Padding
+from src.modes.ecb import AES_ECB, PKCS7Padding
 import subprocess
 
 
@@ -86,4 +86,5 @@ class TestCLI(unittest.TestCase):
 
 
 if __name__ == '__main__':
+
     unittest.main()
